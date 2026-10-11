@@ -1,8 +1,55 @@
 ---
 import Studio from '../../layouts/Studio.astro';
-import {authConfigured,passwordConfigured} from '../../lib/auth';
-if(Astro.locals.session)return Astro.redirect('/studio/',303);
-const error=Astro.url.searchParams.get('error');
-const message=error==='credentials'?'The email or password is incorrect.':error==='access'?'Your account does not have publishing access.':error==='sign-in'?'Sign-in could not be completed. Please try again.':undefined;
+import { authConfigured, passwordConfigured } from '../../lib/auth';
+if (Astro.locals.session) return Astro.redirect('/studio/', 303);
+const error = Astro.url.searchParams.get('error');
+const message =
+  error === 'credentials'
+    ? 'The email or password is incorrect.'
+    : error === 'access'
+      ? 'Your account does not have publishing access.'
+      : error === 'sign-in'
+        ? 'Sign-in could not be completed. Please try again.'
+        : undefined;
 ---
-<Studio title="Sign in | Sparks Studio"><section class="studio-login"><h1>Welcome to Studio</h1><p>Write, edit and publish on Sparks.</p>{message&&<p role="alert" class="form-error">{message}</p>}{passwordConfigured()&&<form action="/auth/password/" method="post" class="login-form"><label class="field"><span>Email</span><input type="email" name="email" autocomplete="username" required/></label><label class="field"><span>Password</span><input type="password" name="password" autocomplete="current-password" required maxlength="256"/></label><button class="button primary" type="submit">Sign in</button></form>}{authConfigured()&&<a class="button" href="/auth/login/">Continue with GitHub</a>}{!authConfigured()&&!passwordConfigured()&&<p class="muted">Publishing access has not been connected yet.</p>}</section></Studio>
+
+<Studio title="Sign in | Sparks Studio">
+  <section class="studio-login">
+    <h1>Welcome to Studio</h1>
+    <p>Write, edit and publish on Sparks.</p>
+    {message && (
+      <p role="alert" class="form-error">
+        {message}
+      </p>
+    )}
+    {passwordConfigured() && (
+      <form action="/auth/password/" method="post" class="login-form">
+        <label class="field">
+          <span>Email</span>
+          <input type="email" name="email" autocomplete="username" required />
+        </label>
+        <label class="field">
+          <span>Password</span>
+          <input
+            type="password"
+            name="password"
+            autocomplete="current-password"
+            required
+            maxlength="256"
+          />
+        </label>
+        <button class="button primary" type="submit">
+          Sign in
+        </button>
+      </form>
+    )}
+    {authConfigured() && (
+      <a class="button" href="/auth/login/">
+        Continue with GitHub
+      </a>
+    )}
+    {!authConfigured() && !passwordConfigured() && (
+      <p class="muted">Publishing access has not been connected yet.</p>
+    )}
+  </section>
+</Studio>

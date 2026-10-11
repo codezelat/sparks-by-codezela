@@ -1,23 +1,136 @@
-import {beforeAll,afterAll,describe,it,expect} from 'bun:test';
-import {PGlite} from '@electric-sql/pglite';
-import {readFile} from 'node:fs/promises';
-import {repository,ConflictError} from '../src/lib/repository';
-import {articleInput,prepareArticle} from '../src/lib/content';
-import type {Query} from '../src/lib/db';
-async function rejectsConflict(promise:Promise<unknown>){let error:unknown;try{await promise;}catch(caught){error=caught;}expect(error).toBeInstanceOf(ConflictError);}
-const db=new PGlite();const query:Query=async(text,params=[]) => (await db.query<any>(text,params)).rows;const repo=repository(query);
-const create=(id:string,slug:string,title='A title',date='2026-01-01T00:00:00.000Z')=>prepareArticle(articleInput.parse({title,slug,html:'<h2 id="intro">Introduction</h2><p>Search advertising and innovation.</p>',publishedAt:date}),id);
-beforeAll(async()=>{await db.exec(await readFile('migrations/001-content.sql','utf8'));await db.exec(await readFile('migrations/003-pages.sql','utf8'));await db.exec(await readFile('migrations/004-editor-history.sql','utf8'));},30000);
-afterAll(()=>db.close());
-describe('Postgres publishing contract',()=>{
-  it('keeps drafts out of public queries and records revisions',async()=>{await repo.save(create('one','first-article'),0,'draft','tester');expect(await repo.get('first-article')).toBeUndefined();expect((await repo.studioList()).articles[0].status).toBe('draft');expect((await query('SELECT * FROM revisions')).length).toBe(1);});
-  it('publishes atomically and indexes searchable text',async()=>{await repo.save(create('one','first-article'),1,'publish','tester');expect((await repo.get('first-article'))?.title).toBe('A title');expect((await repo.list({search:'advertising'})).total).toBe(1);expect((await repo.list()).articles[0]).not.toHaveProperty('html');});
-  it('leaves the published article unchanged when saving an edit as draft',async()=>{await repo.save(create('one','first-article','Changed title'),2,'draft','tester');expect((await repo.get('first-article'))?.title).toBe('A title');expect((await repo.studioGet('one'))?.draft?.title).toBe('Changed title');});
-  it('rejects concurrent stale saves and changes to published URLs',async()=>{await rejectsConflict(repo.save(create('one','first-article','Stale'),2,'publish','tester'));await rejectsConflict(repo.save(create('one','renamed-article'),3,'publish','tester'));});
-  it('publishes saved edits and keeps the latest revision',async()=>{const saved=await repo.save(create('one','first-article','Changed title'),3,'publish','tester');expect(saved.version).toBe(4);expect((await repo.get('first-article'))?.title).toBe('Changed title');expect((await repo.studioGet('one'))?.draft).toBeNull();expect((await query('SELECT * FROM revisions WHERE article_id=$1',['one'])).length).toBe(4);});
-  it('prevents two articles from claiming the same URL',async()=>{await rejectsConflict(repo.save(create('two','first-article'),0,'publish','tester'));});
-  it('hides scheduled articles until their publication date',async()=>{await repo.save(create('future','scheduled','Future','2099-01-01T00:00:00.000Z'),0,'publish','tester');expect(await repo.get('scheduled')).toBeUndefined();expect((await repo.urls()).some(p=>p.slug==='scheduled')).toBe(false);});
-  it('restores history as a draft and safely unpublishes',async()=>{const post=create('history','history-post','First title');await repo.save(post,0,'publish','tester');await repo.save({...post,title:'Second title'},1,'publish','tester');const revisions=await repo.revisions('history');await repo.restore('history',revisions[1].id,2,'tester');expect((await repo.get('history-post'))?.title).toBe('Second title');expect((await repo.studioGet('history'))?.draft?.title).toBe('First title');await repo.unpublish('history',3,'tester');expect(await repo.get('history-post')).toBeUndefined();expect((await repo.studioGet('history'))?.draft?.title).toBe('First title');});
-  it('publishes pages separately from article archives',async()=>{const page=create('page','an-about-page');page.kind='page';await repo.save(page,0,'publish','tester');expect((await repo.get('an-about-page'))?.kind).toBe('page');expect((await repo.studioList(1,'','','page')).total).toBe(1);expect((await repo.list()).articles.some(p=>p.kind==='page')).toBe(false);});
-  it('filters author and tag archives using indexed JSON fields',async()=>{const p=create('news','a-news-post');p.tags=['news'];await repo.save(p,0,'publish','tester');expect((await repo.list({tag:'news'})).total).toBe(1);expect((await repo.list({author:'codezela-cc'})).total).toBe(2);});
+import { beforeAll, afterAll, describe, it, expect } from 'bun:test';
+import { PGlite } from '@electric-sql/pglite';
+import { readFile } from 'node:fs/promises';
+import { repository, ConflictError } from '../src/lib/repository';
+import { articleInput, prepareArticle } from '../src/lib/content';
+import type { Query } from '../src/lib/db';
+async function rejectsConflict(promise: Promise<unknown>) {
+  let error: unknown;
+  try {
+    await promise;
+  } catch (caught) {
+    error = caught;
+  }
+  expect(error).toBeInstanceOf(ConflictError);
+}
+const db = new PGlite();
+const query: Query = async (text, params = []) =>
+  (await db.query<any>(text, params)).rows;
+const repo = repository(query);
+const create = (
+  id: string,
+  slug: string,
+  title = 'A title',
+  date = '2026-01-01T00:00:00.000Z',
+) =>
+  prepareArticle(
+    articleInput.parse({
+      title,
+      slug,
+      html: '<h2 id="intro">Introduction</h2><p>Search advertising and innovation.</p>',
+      publishedAt: date,
+    }),
+    id,
+  );
+beforeAll(async () => {
+  await db.exec(await readFile('migrations/001-content.sql', 'utf8'));
+  await db.exec(await readFile('migrations/003-pages.sql', 'utf8'));
+  await db.exec(await readFile('migrations/004-editor-history.sql', 'utf8'));
+}, 30000);
+afterAll(() => db.close());
+describe('Postgres publishing contract', () => {
+  it('keeps drafts out of public queries and records revisions', async () => {
+    await repo.save(create('one', 'first-article'), 0, 'draft', 'tester');
+    expect(await repo.get('first-article')).toBeUndefined();
+    expect((await repo.studioList()).articles[0].status).toBe('draft');
+    expect((await query('SELECT * FROM revisions')).length).toBe(1);
+  });
+  it('publishes atomically and indexes searchable text', async () => {
+    await repo.save(create('one', 'first-article'), 1, 'publish', 'tester');
+    expect((await repo.get('first-article'))?.title).toBe('A title');
+    expect((await repo.list({ search: 'advertising' })).total).toBe(1);
+    expect((await repo.list()).articles[0]).not.toHaveProperty('html');
+  });
+  it('leaves the published article unchanged when saving an edit as draft', async () => {
+    await repo.save(
+      create('one', 'first-article', 'Changed title'),
+      2,
+      'draft',
+      'tester',
+    );
+    expect((await repo.get('first-article'))?.title).toBe('A title');
+    expect((await repo.studioGet('one'))?.draft?.title).toBe('Changed title');
+  });
+  it('rejects concurrent stale saves and changes to published URLs', async () => {
+    await rejectsConflict(
+      repo.save(
+        create('one', 'first-article', 'Stale'),
+        2,
+        'publish',
+        'tester',
+      ),
+    );
+    await rejectsConflict(
+      repo.save(create('one', 'renamed-article'), 3, 'publish', 'tester'),
+    );
+  });
+  it('publishes saved edits and keeps the latest revision', async () => {
+    const saved = await repo.save(
+      create('one', 'first-article', 'Changed title'),
+      3,
+      'publish',
+      'tester',
+    );
+    expect(saved.version).toBe(4);
+    expect((await repo.get('first-article'))?.title).toBe('Changed title');
+    expect((await repo.studioGet('one'))?.draft).toBeNull();
+    expect(
+      (await query('SELECT * FROM revisions WHERE article_id=$1', ['one']))
+        .length,
+    ).toBe(4);
+  });
+  it('prevents two articles from claiming the same URL', async () => {
+    await rejectsConflict(
+      repo.save(create('two', 'first-article'), 0, 'publish', 'tester'),
+    );
+  });
+  it('hides scheduled articles until their publication date', async () => {
+    await repo.save(
+      create('future', 'scheduled', 'Future', '2099-01-01T00:00:00.000Z'),
+      0,
+      'publish',
+      'tester',
+    );
+    expect(await repo.get('scheduled')).toBeUndefined();
+    expect((await repo.urls()).some((p) => p.slug === 'scheduled')).toBe(false);
+  });
+  it('restores history as a draft and safely unpublishes', async () => {
+    const post = create('history', 'history-post', 'First title');
+    await repo.save(post, 0, 'publish', 'tester');
+    await repo.save({ ...post, title: 'Second title' }, 1, 'publish', 'tester');
+    const revisions = await repo.revisions('history');
+    await repo.restore('history', revisions[1].id, 2, 'tester');
+    expect((await repo.get('history-post'))?.title).toBe('Second title');
+    expect((await repo.studioGet('history'))?.draft?.title).toBe('First title');
+    await repo.unpublish('history', 3, 'tester');
+    expect(await repo.get('history-post')).toBeUndefined();
+    expect((await repo.studioGet('history'))?.draft?.title).toBe('First title');
+  });
+  it('publishes pages separately from article archives', async () => {
+    const page = create('page', 'an-about-page');
+    page.kind = 'page';
+    await repo.save(page, 0, 'publish', 'tester');
+    expect((await repo.get('an-about-page'))?.kind).toBe('page');
+    expect((await repo.studioList(1, '', '', 'page')).total).toBe(1);
+    expect((await repo.list()).articles.some((p) => p.kind === 'page')).toBe(
+      false,
+    );
+  });
+  it('filters author and tag archives using indexed JSON fields', async () => {
+    const p = create('news', 'a-news-post');
+    p.tags = ['news'];
+    await repo.save(p, 0, 'publish', 'tester');
+    expect((await repo.list({ tag: 'news' })).total).toBe(1);
+    expect((await repo.list({ author: 'codezela-cc' })).total).toBe(2);
+  });
 });

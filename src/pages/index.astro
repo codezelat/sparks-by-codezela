@@ -3,9 +3,61 @@ import Base from '../layouts/Base.astro';
 import Media from '../components/Media.astro';
 import ArticleRow from '../components/ArticleRow.astro';
 import Icon from '../components/Icon.astro';
-import {latestArticles,site,origin} from '../lib/site';
-import {dateLabel} from '../lib/content';
-const articles=await latestArticles(4);const [lead,...latest]=articles;
-const schema={'@context':'https://schema.org','@graph':[{'@type':'Organization','@id':`${origin}/#organization`,name:'Codezela Technologies',url:'https://codezela.com',logo:new URL(site.logo,origin).href},{'@type':'WebSite','@id':`${origin}/#website`,name:site.name,url:origin,description:site.description,publisher:{'@id':`${origin}/#organization`}}]};
+import { latestArticles, site, origin } from '../lib/site';
+import { dateLabel } from '../lib/content';
+const articles = await latestArticles(4);
+const [lead, ...latest] = articles;
+const schema = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      '@id': `${origin}/#organization`,
+      name: 'Codezela Technologies',
+      url: 'https://codezela.com',
+      logo: new URL(site.logo, origin).href,
+    },
+    {
+      '@type': 'WebSite',
+      '@id': `${origin}/#website`,
+      name: site.name,
+      url: origin,
+      description: site.description,
+      publisher: { '@id': `${origin}/#organization` },
+    },
+  ],
+};
 ---
-<Base schema={schema}><div class="shell"><h1 class="masthead">{site.slogan}</h1>{lead&&<article class="feature"><a href={`/${lead.slug}/`} tabindex="-1" aria-hidden="true"><Media article={lead} priority class="feature-image"/></a><div><time datetime={lead.publishedAt}>{dateLabel(lead.publishedAt)}</time><h2><a href={`/${lead.slug}/`}>{lead.title}</a></h2><a href={`/${lead.slug}/`} class="text-link">Read article <Icon/></a></div></article>}<section aria-labelledby="latest-heading"><div class="section-heading"><h2 id="latest-heading">Latest</h2><a href="/page/1/" class="text-link">See all <Icon/></a></div>{latest.map(article=><ArticleRow article={article}/>)}</section></div></Base>
+
+<Base schema={schema}>
+  <div class="shell">
+    <h1 class="masthead">{site.slogan}</h1>
+    {lead && (
+      <article class="feature">
+        <a href={`/${lead.slug}/`} tabindex="-1" aria-hidden="true">
+          <Media article={lead} priority class="feature-image" />
+        </a>
+        <div>
+          <time datetime={lead.publishedAt}>{dateLabel(lead.publishedAt)}</time>
+          <h2>
+            <a href={`/${lead.slug}/`}>{lead.title}</a>
+          </h2>
+          <a href={`/${lead.slug}/`} class="text-link">
+            Read article <Icon />
+          </a>
+        </div>
+      </article>
+    )}
+    <section aria-labelledby="latest-heading">
+      <div class="section-heading">
+        <h2 id="latest-heading">Latest</h2>
+        <a href="/page/1/" class="text-link">
+          See all <Icon />
+        </a>
+      </div>
+      {latest.map((article) => (
+        <ArticleRow article={article} />
+      ))}
+    </section>
+  </div>
+</Base>

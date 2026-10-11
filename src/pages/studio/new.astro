@@ -1,6 +1,10 @@
 ---
 import Studio from '../../layouts/Studio.astro';
 import Editor from '../../components/studio/Editor';
-const id=crypto.randomUUID();const kind=Astro.url.searchParams.get('kind')==='page'?'page':'post';
+const id = crypto.randomUUID();
+const kind = Astro.url.searchParams.get('kind') === 'page' ? 'page' : 'post';
 ---
-<Studio title="New article | Sparks Studio"><Editor id={id} kind={kind} client:only="react"/></Studio>
+
+<Studio title="New article | Sparks Studio">
+  <Editor id={id} kind={kind} client:only="react" />
+</Studio>

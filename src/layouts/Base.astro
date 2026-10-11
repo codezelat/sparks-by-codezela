@@ -1,23 +1,130 @@
 ---
 import '@fontsource-variable/inter';
 import '../styles/global.css';
-import {site,origin} from '../lib/site';
+import { site, origin } from '../lib/site';
 import Header from '../components/Header.astro';
 import Search from '../components/Search.astro';
-interface Props {title?:string;description?:string;canonical?:string;image?:string|null;ogTitle?:string;ogDescription?:string;twitterTitle?:string;twitterDescription?:string;twitterImage?:string|null;type?:string;schema?:unknown;noindex?:boolean;publishedAt?:string;updatedAt?:string;}
-const {title=site.title,description=site.description,canonical=new URL(Astro.url.pathname,origin).href,image=site.ogImage,ogTitle=title,ogDescription=description,twitterTitle=title,twitterDescription=description,twitterImage=site.twitterImage,type='website',schema,noindex=false,publishedAt,updatedAt}=Astro.props;
-const absolute=(url:string)=>new URL(url,origin).href;
-const ga=import.meta.env.PUBLIC_GA_ID;
+interface Props {
+  title?: string;
+  description?: string;
+  canonical?: string;
+  image?: string | null;
+  ogTitle?: string;
+  ogDescription?: string;
+  twitterTitle?: string;
+  twitterDescription?: string;
+  twitterImage?: string | null;
+  type?: string;
+  schema?: unknown;
+  noindex?: boolean;
+  publishedAt?: string;
+  updatedAt?: string;
+}
+const {
+  title = site.title,
+  description = site.description,
+  canonical = new URL(Astro.url.pathname, origin).href,
+  image = site.ogImage,
+  ogTitle = title,
+  ogDescription = description,
+  twitterTitle = title,
+  twitterDescription = description,
+  twitterImage = site.twitterImage,
+  type = 'website',
+  schema,
+  noindex = false,
+  publishedAt,
+  updatedAt,
+} = Astro.props;
+const absolute = (url: string) => new URL(url, origin).href;
+const ga = import.meta.env.PUBLIC_GA_ID;
 ---
-<!doctype html><html lang="en"><head>
-  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>{title}</title><meta name="description" content={description}/><link rel="canonical" href={canonical}/>
-  {noindex&&<meta name="robots" content="noindex, follow"/>}<meta name="theme-color" content="#ffffff"/>
-  <link rel="icon" href={site.icon}/><link rel="alternate" type="application/rss+xml" title={site.name} href={`${origin}/rss/`}/>
-  <meta property="og:site_name" content={site.name}/><meta property="og:type" content={type}/><meta property="og:title" content={ogTitle}/><meta property="og:description" content={ogDescription}/><meta property="og:url" content={canonical}/>{image&&<meta property="og:image" content={absolute(image)}/>}
-  <meta name="twitter:card" content="summary_large_image"/><meta name="twitter:title" content={twitterTitle}/><meta name="twitter:description" content={twitterDescription}/>{(twitterImage||image)&&<meta name="twitter:image" content={absolute((twitterImage||image)!)}/>}
-  <meta name="twitter:site" content={site.twitter}/><meta property="article:publisher" content={`https://www.facebook.com/${site.facebook}`}/>
-  {publishedAt&&<meta property="article:published_time" content={publishedAt}/>} {updatedAt&&<meta property="article:modified_time" content={updatedAt}/>}
-  {schema&&<script type="application/ld+json" set:html={JSON.stringify(schema).replace(/</g,'\\u003c')}/>}
-  {ga&&/^G-[A-Z0-9]+$/.test(ga)&&<><script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${ga}`}></script><script is:inline define:vars={{ga}}>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config',ga);</script></>}
-</head><body><a class="skip-link" href="#main">Skip to content</a><Header/><main id="main"><slot/></main><footer class="site-footer shell"><div><a href="/">Sparks by Codezela</a><a class="muted" href="https://codezela.com/">Official Website</a></div><nav aria-label="Footer navigation"><a href="/about/">About</a><a href="/rss/">RSS</a><a href="/search/" data-open-search aria-label="Search">Search</a></nav></footer><Search/></body></html>
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" href={site.icon} />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title={site.name}
+      href={`${origin}/rss/`}
+    />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:type" content={type} />
+    <meta property="og:title" content={ogTitle} />
+    <meta property="og:description" content={ogDescription} />
+    <meta property="og:url" content={canonical} />
+    {image && <meta property="og:image" content={absolute(image)} />}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={twitterTitle} />
+    <meta name="twitter:description" content={twitterDescription} />
+    {(twitterImage || image) && (
+      <meta name="twitter:image" content={absolute((twitterImage || image)!)} />
+    )}
+    <meta name="twitter:site" content={site.twitter} />
+    <meta
+      property="article:publisher"
+      content={`https://www.facebook.com/${site.facebook}`}
+    />
+    {publishedAt && (
+      <meta property="article:published_time" content={publishedAt} />
+    )}
+    {updatedAt && <meta property="article:modified_time" content={updatedAt} />}
+    {schema && (
+      <script
+        type="application/ld+json"
+        set:html={JSON.stringify(schema).replace(/</g, '\\u003c')}
+      />
+    )}
+    {ga && /^G-[A-Z0-9]+$/.test(ga) && (
+      <>
+        <script
+          is:inline
+          async
+          src={`https://www.googletagmanager.com/gtag/js?id=${ga}`}
+        ></script>
+        <script is:inline define:vars={{ ga }}>
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', ga);
+        </script>
+      </>
+    )}
+  </head>
+  <body>
+    <a class="skip-link" href="#main">
+      Skip to content
+    </a>
+    <Header />
+    <main id="main">
+      <slot />
+    </main>
+    <footer class="site-footer shell">
+      <div>
+        <a href="/">Sparks by Codezela</a>
+        <a class="muted" href="https://codezela.com/">
+          Official Website
+        </a>
+      </div>
+      <nav aria-label="Footer navigation">
+        <a href="/about/">About</a>
+        <a href="/rss/">RSS</a>
+        <a href="/search/" data-open-search aria-label="Search">
+          Search
+        </a>
+      </nav>
+    </footer>
+    <Search />
+  </body>
+</html>

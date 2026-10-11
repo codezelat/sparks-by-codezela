@@ -8,5 +8,11 @@ export default defineConfig({
   integrations: [react()],
   trailingSlash: 'always',
   devToolbar: { enabled: false },
-  vite: { cacheDir: process.env.SPARKS_DEV === '1' ? 'node_modules/.vite-sparks-dev' : 'node_modules/.vite-sparks-build', server: { allowedHosts: ['localhost','127.0.0.1'] } },
+  vite: {
+    cacheDir:
+      process.env.SPARKS_DEV === '1'
+        ? 'node_modules/.vite-sparks-dev'
+        : 'node_modules/.vite-sparks-build',
+    server: { allowedHosts: ['localhost', '127.0.0.1'] },
+  },
 });

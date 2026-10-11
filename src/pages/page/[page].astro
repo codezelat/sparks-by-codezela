@@ -2,12 +2,45 @@
 import Base from '../../layouts/Base.astro';
 import ArticleRow from '../../components/ArticleRow.astro';
 import Icon from '../../components/Icon.astro';
-import {listArticles,site} from '../../lib/site';
-import {PAGE_SIZE} from '../../lib/content';
-const page=Number(Astro.params.page);
-if(!Number.isSafeInteger(page)||page<1||page>10000)return Astro.redirect('/404/',302);
-const {articles,total}=await listArticles({page,limit:PAGE_SIZE});
-if(!articles.length&&page>1)return Astro.redirect('/404/',302);
-const last=Math.ceil(total/PAGE_SIZE);
+import { listArticles, site } from '../../lib/site';
+import { PAGE_SIZE } from '../../lib/content';
+const page = Number(Astro.params.page);
+if (!Number.isSafeInteger(page) || page < 1 || page > 10000)
+  return Astro.redirect('/404/', 302);
+const { articles, total } = await listArticles({ page, limit: PAGE_SIZE });
+if (!articles.length && page > 1) return Astro.redirect('/404/', 302);
+const last = Math.ceil(total / PAGE_SIZE);
 ---
-<Base title={`Latest${page>1?`, page ${page}`:''} | ${site.name}`}><section class="shell"><div class="archive-head"><h1 class="page-heading">Latest</h1><p>{total} articles</p></div>{articles.map(article=><ArticleRow article={article}/>)}<nav class="pagination" aria-label="Pagination"><span>{page>1&&<a class="text-link" href={`/page/${page-1}/`}><Icon name="back"/>Previous</a>}</span><span class="muted">{page} / {last||1}</span><span>{page<last&&<a class="text-link" href={`/page/${page+1}/`}>Next<Icon/></a>}</span></nav></section></Base>
+
+<Base title={`Latest${page > 1 ? `, page ${page}` : ''} | ${site.name}`}>
+  <section class="shell">
+    <div class="archive-head">
+      <h1 class="page-heading">Latest</h1>
+      <p>{total} articles</p>
+    </div>
+    {articles.map((article) => (
+      <ArticleRow article={article} />
+    ))}
+    <nav class="pagination" aria-label="Pagination">
+      <span>
+        {page > 1 && (
+          <a class="text-link" href={`/page/${page - 1}/`}>
+            <Icon name="back" />
+            Previous
+          </a>
+        )}
+      </span>
+      <span class="muted">
+        {page} / {last || 1}
+      </span>
+      <span>
+        {page < last && (
+          <a class="text-link" href={`/page/${page + 1}/`}>
+            Next
+            <Icon />
+          </a>
+        )}
+      </span>
+    </nav>
+  </section>
+</Base>

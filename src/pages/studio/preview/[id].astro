@@ -1,11 +1,42 @@
 ---
 import Base from '../../../layouts/Base.astro';
-import {repository} from '../../../lib/repository';
-import {database} from '../../../lib/db';
-import {safeHtml,dateLabel} from '../../../lib/content';
+import { repository } from '../../../lib/repository';
+import { database } from '../../../lib/db';
+import { safeHtml, dateLabel } from '../../../lib/content';
 import Media from '../../../components/Media.astro';
-const record=await repository(await database()).studioGet(Astro.params.id!);if(!record)return Astro.redirect('/studio/',303);
-const article=(record.draft||record.published)!;
+const record = await repository(await database()).studioGet(Astro.params.id!);
+if (!record) return Astro.redirect('/studio/', 303);
+const article = (record.draft || record.published)!;
 ---
-<Base title={`Preview: ${article.title}`} description={article.excerpt} noindex><div class="preview-notice">Draft preview <a href={`/studio/edit/${article.id}/`}>Back to editor</a></div><article class="reading"><header class="reading-head"><time datetime={article.publishedAt}>{dateLabel(article.publishedAt)}</time><h1>{article.title}</h1></header>{article.featureImage&&<figure class="article-cover"><Media article={article} priority sizes="740px"/></figure>}<div class="prose" set:html={safeHtml(article.html)}/></article></Base>
-<style>.preview-notice{background:#f8f2fa;padding:14px;text-align:center;font-size:13px}.preview-notice a{margin-left:20px;color:var(--accent)}</style>
+
+<Base title={`Preview: ${article.title}`} description={article.excerpt} noindex>
+  <div class="preview-notice">
+    Draft preview <a href={`/studio/edit/${article.id}/`}>Back to editor</a>
+  </div>
+  <article class="reading">
+    <header class="reading-head">
+      <time datetime={article.publishedAt}>
+        {dateLabel(article.publishedAt)}
+      </time>
+      <h1>{article.title}</h1>
+    </header>
+    {article.featureImage && (
+      <figure class="article-cover">
+        <Media article={article} priority sizes="740px" />
+      </figure>
+    )}
+    <div class="prose" set:html={safeHtml(article.html)} />
+  </article>
+</Base>
+<style>
+  .preview-notice {
+    background: #f8f2fa;
+    padding: 14px;
+    text-align: center;
+    font-size: 13px;
+  }
+  .preview-notice a {
+    margin-left: 20px;
+    color: var(--accent);
+  }
+</style>

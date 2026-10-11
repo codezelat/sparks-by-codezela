@@ -1,9 +1,19 @@
 ---
 import Archive from '../../../../components/Archive.astro';
-import {listArticles,tags} from '../../../../lib/site';
-const tag=tags.find(t=>t.slug===Astro.params.slug);const page=Number(Astro.params.page);
-if(!tag||!Number.isSafeInteger(page)||page<1||page>10000)return Astro.redirect('/404/',302);
-if(page===1)return Astro.redirect(`/tag/${tag.slug}/`,301);
-const result=await listArticles({tag:tag.slug,page});if(!result.articles.length)return Astro.redirect('/404/',302);
+import { listArticles, tags } from '../../../../lib/site';
+const tag = tags.find((t) => t.slug === Astro.params.slug);
+const page = Number(Astro.params.page);
+if (!tag || !Number.isSafeInteger(page) || page < 1 || page > 10000)
+  return Astro.redirect('/404/', 302);
+if (page === 1) return Astro.redirect(`/tag/${tag.slug}/`, 301);
+const result = await listArticles({ tag: tag.slug, page });
+if (!result.articles.length) return Astro.redirect('/404/', 302);
 ---
-<Archive name={tag.name} {...result} page={page} base={`/tag/${tag.slug}/`} description={tag.description||undefined}/>
+
+<Archive
+  name={tag.name}
+  {...result}
+  page={page}
+  base={`/tag/${tag.slug}/`}
+  description={tag.description || undefined}
+/>

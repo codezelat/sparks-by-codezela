@@ -1,9 +1,19 @@
 ---
 import Archive from '../../../../components/Archive.astro';
-import {listArticles,authors} from '../../../../lib/site';
-const author=authors.find(t=>t.slug===Astro.params.slug);const page=Number(Astro.params.page);
-if(!author||!Number.isSafeInteger(page)||page<1||page>10000)return Astro.redirect('/404/',302);
-if(page===1)return Astro.redirect(`/author/${author.slug}/`,301);
-const result=await listArticles({author:author.slug,page});if(!result.articles.length)return Astro.redirect('/404/',302);
+import { listArticles, authors } from '../../../../lib/site';
+const author = authors.find((t) => t.slug === Astro.params.slug);
+const page = Number(Astro.params.page);
+if (!author || !Number.isSafeInteger(page) || page < 1 || page > 10000)
+  return Astro.redirect('/404/', 302);
+if (page === 1) return Astro.redirect(`/author/${author.slug}/`, 301);
+const result = await listArticles({ author: author.slug, page });
+if (!result.articles.length) return Astro.redirect('/404/', 302);
 ---
-<Archive name={author.name} {...result} page={page} base={`/author/${author.slug}/`} description={author.bio||undefined}/>
+
+<Archive
+  name={author.name}
+  {...result}
+  page={page}
+  base={`/author/${author.slug}/`}
+  description={author.bio || undefined}
+/>

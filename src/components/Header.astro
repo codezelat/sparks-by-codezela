@@ -1,8 +1,29 @@
 ---
 import Icon from './Icon.astro';
-const path=Astro.url.pathname;
+const path = Astro.url.pathname;
 ---
+
 <header class="site-header shell">
-  <a class="wordmark" href="/" aria-label="Sparks by Codezela home"><span>sparks<span class="brand-dot">.</span></span><small>by Codezela</small></a>
-  <nav aria-label="Main navigation"><a href="/" aria-current={path==='/'?'page':undefined}>Home</a><a href="/about/" aria-current={path==='/about/'?'page':undefined}>About</a><a href="/search/" data-open-search class="search-trigger" aria-label="Search"><Icon name="search"/></a></nav>
+  <a class="wordmark" href="/" aria-label="Sparks by Codezela home">
+    <span>
+      sparks<span class="brand-dot">.</span>
+    </span>
+    <small>by Codezela</small>
+  </a>
+  <nav aria-label="Main navigation">
+    <a href="/" aria-current={path === '/' ? 'page' : undefined}>
+      Home
+    </a>
+    <a href="/about/" aria-current={path === '/about/' ? 'page' : undefined}>
+      About
+    </a>
+    <a
+      href="/search/"
+      data-open-search
+      class="search-trigger"
+      aria-label="Search"
+    >
+      <Icon name="search" />
+    </a>
+  </nav>
 </header>

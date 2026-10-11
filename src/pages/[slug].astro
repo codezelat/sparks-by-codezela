@@ -1,16 +1,148 @@
 ---
 import Base from '../layouts/Base.astro';
 import Media from '../components/Media.astro';
-import {getArticle,latestArticles,authors,site,origin} from '../lib/site';
-import {dateLabel,safeHtml} from '../lib/content';
-const [article,latest]=await Promise.all([getArticle(Astro.params.slug!),latestArticles(4)]);
-if(!article){Astro.response.status=404;}
-const isPage=article?.kind==='page';
-const canonical=article?.canonicalUrl || `${origin}/${article?.slug}/`;
-const related=article?latest.filter(p=>p.id!==article.id).slice(0,2):[];
-const schema=article?{'@context':'https://schema.org','@graph':[{'@type':isPage?'WebPage':'BlogPosting','@id':`${canonical}#article`,headline:article.title,description:article.metaDescription||article.excerpt,datePublished:article.publishedAt,dateModified:article.updatedAt,mainEntityOfPage:canonical,image:article.featureImage?[new URL(article.featureImage,origin).href]:undefined,author:article.authors.map(slug=>({'@type':'Organization',name:authors.find(a=>a.slug===slug)?.name || slug,url:`${origin}/author/${slug}/`})),publisher:{'@type':'Organization',name:'Codezela Technologies',url:'https://codezela.com',logo:{'@type':'ImageObject',url:new URL(site.logo,origin).href}}},{'@type':'BreadcrumbList',itemListElement:[{'@type':'ListItem',position:1,name:site.name,item:origin},{'@type':'ListItem',position:2,name:article.title,item:canonical}]}]}:undefined;
+import { getArticle, latestArticles, authors, site, origin } from '../lib/site';
+import { dateLabel, safeHtml } from '../lib/content';
+const [article, latest] = await Promise.all([
+  getArticle(Astro.params.slug!),
+  latestArticles(4),
+]);
+if (!article) {
+  Astro.response.status = 404;
+}
+const isPage = article?.kind === 'page';
+const canonical = article?.canonicalUrl || `${origin}/${article?.slug}/`;
+const related = article
+  ? latest.filter((p) => p.id !== article.id).slice(0, 2)
+  : [];
+const schema = article
+  ? {
+      '@context': 'https://schema.org',
+      '@graph': [
+        {
+          '@type': isPage ? 'WebPage' : 'BlogPosting',
+          '@id': `${canonical}#article`,
+          headline: article.title,
+          description: article.metaDescription || article.excerpt,
+          datePublished: article.publishedAt,
+          dateModified: article.updatedAt,
+          mainEntityOfPage: canonical,
+          image: article.featureImage
+            ? [new URL(article.featureImage, origin).href]
+            : undefined,
+          author: article.authors.map((slug) => ({
+            '@type': 'Organization',
+            name: authors.find((a) => a.slug === slug)?.name || slug,
+            url: `${origin}/author/${slug}/`,
+          })),
+          publisher: {
+            '@type': 'Organization',
+            name: 'Codezela Technologies',
+            url: 'https://codezela.com',
+            logo: {
+              '@type': 'ImageObject',
+              url: new URL(site.logo, origin).href,
+            },
+          },
+        },
+        {
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            { '@type': 'ListItem', position: 1, name: site.name, item: origin },
+            {
+              '@type': 'ListItem',
+              position: 2,
+              name: article.title,
+              item: canonical,
+            },
+          ],
+        },
+      ],
+    }
+  : undefined;
 ---
-<Base title={article?article.metaTitle||article.title:'Page not found | Sparks'} description={article?.metaDescription||article?.excerpt} canonical={article?canonical:undefined} image={article?.ogImage||article?.featureImage||site.ogImage} ogTitle={article?.ogTitle||article?.metaTitle||article?.title} ogDescription={article?.ogDescription||article?.metaDescription||article?.excerpt} twitterTitle={article?.twitterTitle||article?.metaTitle||article?.title} twitterDescription={article?.twitterDescription||article?.metaDescription||article?.excerpt} twitterImage={article?.twitterImage||article?.featureImage} type={isPage?'website':'article'} schema={schema} noindex={!article} publishedAt={article?.publishedAt} updatedAt={article?.updatedAt}>
-  {article?<article class="reading"><header class="reading-head">{!isPage&&<><time datetime={article.publishedAt}>{dateLabel(article.publishedAt)}</time><span class="muted reading-time"> · {article.readingMinutes} min read</span></>}<h1>{article.title}</h1>{!isPage&&<p class="byline">{article.authors.map(slug=><a href={`/author/${slug}/`}>{authors.find(a=>a.slug===slug)?.name||slug}</a>)}</p>}</header>{article.featureImage&&<figure class="article-cover"><Media article={article} priority sizes="(max-width: 800px) 100vw, 740px"/>{article.featureImageCaption&&<figcaption set:html={safeHtml(article.featureImageCaption)}/>}</figure>}<div class="prose" set:html={safeHtml(article.html)}/>{!isPage&&related.length>0&&<aside class="related" aria-label="More articles"><h2>More articles</h2>{related.map(p=><a href={`/${p.slug}/`}>{p.title}</a>)}</aside>}</article>:<div class="shell error-page"><h1 class="page-heading">Page not found</h1><p>This page could not be found.</p><a href="/" class="text-link">Back to home</a></div>}
+
+<Base
+  title={
+    article ? article.metaTitle || article.title : 'Page not found | Sparks'
+  }
+  description={article?.metaDescription || article?.excerpt}
+  canonical={article ? canonical : undefined}
+  image={article?.ogImage || article?.featureImage || site.ogImage}
+  ogTitle={article?.ogTitle || article?.metaTitle || article?.title}
+  ogDescription={
+    article?.ogDescription || article?.metaDescription || article?.excerpt
+  }
+  twitterTitle={article?.twitterTitle || article?.metaTitle || article?.title}
+  twitterDescription={
+    article?.twitterDescription || article?.metaDescription || article?.excerpt
+  }
+  twitterImage={article?.twitterImage || article?.featureImage}
+  type={isPage ? 'website' : 'article'}
+  schema={schema}
+  noindex={!article}
+  publishedAt={article?.publishedAt}
+  updatedAt={article?.updatedAt}
+>
+  {article ? (
+    <article class="reading">
+      <header class="reading-head">
+        {!isPage && (
+          <>
+            <time datetime={article.publishedAt}>
+              {dateLabel(article.publishedAt)}
+            </time>
+            <span class="muted reading-time">
+              {' '}
+              · {article.readingMinutes} min read
+            </span>
+          </>
+        )}
+        <h1>{article.title}</h1>
+        {!isPage && (
+          <p class="byline">
+            {article.authors.map((slug) => (
+              <a href={`/author/${slug}/`}>
+                {authors.find((a) => a.slug === slug)?.name || slug}
+              </a>
+            ))}
+          </p>
+        )}
+      </header>
+      {article.featureImage && (
+        <figure class="article-cover">
+          <Media
+            article={article}
+            priority
+            sizes="(max-width: 800px) 100vw, 740px"
+          />
+          {article.featureImageCaption && (
+            <figcaption set:html={safeHtml(article.featureImageCaption)} />
+          )}
+        </figure>
+      )}
+      <div class="prose" set:html={safeHtml(article.html)} />
+      {!isPage && related.length > 0 && (
+        <aside class="related" aria-label="More articles">
+          <h2>More articles</h2>
+          {related.map((p) => (
+            <a href={`/${p.slug}/`}>{p.title}</a>
+          ))}
+        </aside>
+      )}
+    </article>
+  ) : (
+    <div class="shell error-page">
+      <h1 class="page-heading">Page not found</h1>
+      <p>This page could not be found.</p>
+      <a href="/" class="text-link">
+        Back to home
+      </a>
+    </div>
+  )}
 </Base>
-<style>.reading-time{font-size:13px}</style>
+<style>
+  .reading-time {
+    font-size: 13px;
+  }
+</style>

@@ -1,31 +1,103 @@
 ---
 import Icon from './Icon.astro';
 ---
+
 <dialog id="site-search" aria-labelledby="search-title">
-  <div class="search-head"><h2 id="search-title">Search</h2><button type="button" data-close-search aria-label="Close search"><Icon name="close"/></button></div>
-  <form action="/search/" method="get"><label class="sr-only" for="search-query">Search articles</label><input id="search-query" name="q" type="search" placeholder="Search articles" autocomplete="off" maxlength="200"/><button class="sr-only" type="submit">Search</button></form>
-  <p class="search-status" aria-live="polite">Search posts, tags and authors</p><ul id="search-results"></ul>
+  <div class="search-head">
+    <h2 id="search-title">Search</h2>
+    <button type="button" data-close-search aria-label="Close search">
+      <Icon name="close" />
+    </button>
+  </div>
+  <form action="/search/" method="get">
+    <label class="sr-only" for="search-query">
+      Search articles
+    </label>
+    <input
+      id="search-query"
+      name="q"
+      type="search"
+      placeholder="Search articles"
+      autocomplete="off"
+      maxlength="200"
+    />
+    <button class="sr-only" type="submit">
+      Search
+    </button>
+  </form>
+  <p class="search-status" aria-live="polite">
+    Search posts, tags and authors
+  </p>
+  <ul id="search-results"></ul>
 </dialog>
 <script>
-  const dialog=document.querySelector<HTMLDialogElement>('#site-search');
-  const input=document.querySelector<HTMLInputElement>('#search-query');
-  const status=document.querySelector<HTMLElement>('.search-status');
-  const results=document.querySelector<HTMLUListElement>('#search-results');
-  if(dialog&&input&&status&&results) {
-    document.querySelectorAll('[data-open-search]').forEach(link=>link.addEventListener('click',event=>{event.preventDefault();dialog.showModal();input.focus();}));
-    document.querySelector('[data-close-search]')?.addEventListener('click',()=>dialog.close());
-    dialog.addEventListener('click',e=>{if(e.target===dialog){const box=dialog.getBoundingClientRect();if(e.clientX<box.left||e.clientX>box.right||e.clientY<box.top||e.clientY>box.bottom)dialog.close();}});
-    let timer:ReturnType<typeof setTimeout>;let controller:AbortController|undefined;
-    input.addEventListener('input',()=>{
-      clearTimeout(timer);controller?.abort();results.replaceChildren();const q=input.value.trim();
-      if(!q){status.textContent='Search posts, tags and authors';return;}
-      status.textContent='Searching…';
-      timer=setTimeout(async()=>{controller=new AbortController();try{
-        const response=await fetch(`/api/search/?q=${encodeURIComponent(q)}`,{signal:controller.signal});if(!response.ok)throw new Error();const data=await response.json();
-        if(input.value.trim()!==q)return;
-        status.textContent=data.total?`${data.total} ${data.total===1?'article':'articles'}`:'No articles found';
-        data.articles.forEach((article:{slug:string;title:string;publishedAt:string})=>{const li=document.createElement('li');const a=document.createElement('a');a.href=`/${article.slug}/`;a.textContent=article.title;li.append(a);results.append(li);});
-      }catch(e){if((e as Error).name!=='AbortError')status.textContent='Search is unavailable. Please try again.';}},200);
+  const dialog = document.querySelector<HTMLDialogElement>('#site-search');
+  const input = document.querySelector<HTMLInputElement>('#search-query');
+  const status = document.querySelector<HTMLElement>('.search-status');
+  const results = document.querySelector<HTMLUListElement>('#search-results');
+  if (dialog && input && status && results) {
+    document.querySelectorAll('[data-open-search]').forEach((link) =>
+      link.addEventListener('click', (event) => {
+        event.preventDefault();
+        dialog.showModal();
+        input.focus();
+      }),
+    );
+    document
+      .querySelector('[data-close-search]')
+      ?.addEventListener('click', () => dialog.close());
+    dialog.addEventListener('click', (e) => {
+      if (e.target === dialog) {
+        const box = dialog.getBoundingClientRect();
+        if (
+          e.clientX < box.left ||
+          e.clientX > box.right ||
+          e.clientY < box.top ||
+          e.clientY > box.bottom
+        )
+          dialog.close();
+      }
+    });
+    let timer: ReturnType<typeof setTimeout>;
+    let controller: AbortController | undefined;
+    input.addEventListener('input', () => {
+      clearTimeout(timer);
+      controller?.abort();
+      results.replaceChildren();
+      const q = input.value.trim();
+      if (!q) {
+        status.textContent = 'Search posts, tags and authors';
+        return;
+      }
+      status.textContent = 'Searching…';
+      timer = setTimeout(async () => {
+        controller = new AbortController();
+        try {
+          const response = await fetch(
+            `/api/search/?q=${encodeURIComponent(q)}`,
+            { signal: controller.signal },
+          );
+          if (!response.ok) throw new Error();
+          const data = await response.json();
+          if (input.value.trim() !== q) return;
+          status.textContent = data.total
+            ? `${data.total} ${data.total === 1 ? 'article' : 'articles'}`
+            : 'No articles found';
+          data.articles.forEach(
+            (article: { slug: string; title: string; publishedAt: string }) => {
+              const li = document.createElement('li');
+              const a = document.createElement('a');
+              a.href = `/${article.slug}/`;
+              a.textContent = article.title;
+              li.append(a);
+              results.append(li);
+            },
+          );
+        } catch (e) {
+          if ((e as Error).name !== 'AbortError')
+            status.textContent = 'Search is unavailable. Please try again.';
+        }
+      }, 200);
     });
   }
 </script>

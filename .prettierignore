@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.astro/
+.vercel/
+.local/
+bun.lock
+src/data/
+public/
+docs/verification/*.json
+docs/migration-inventory.json
