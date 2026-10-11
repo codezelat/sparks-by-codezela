@@ -12,7 +12,9 @@ const origin = 'https://sparks.codezela.com';
 const homepage = await fetch('https://sparks-by-codezela.ghost.io').then((r) =>
   r.text(),
 );
-const key = homepage.match(/data-key="([a-f0-9]+)"/)?.[1];
+const key =
+  process.env.GHOST_CONTENT_KEY ||
+  homepage.match(/data-key="([a-f0-9]+)"/)?.[1];
 if (!key) throw new Error('Public Ghost Content API key not found');
 const api = 'https://sparks-by-codezela.ghost.io/ghost/api/content';
 async function read(name: string) {

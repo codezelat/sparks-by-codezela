@@ -11,7 +11,9 @@ const originals = [...snapshot.posts, ...snapshot.pages];
 const homepage = await fetch('https://sparks-by-codezela.ghost.io').then((r) =>
   r.text(),
 );
-const key = homepage.match(/data-key="([a-f0-9]+)"/)?.[1];
+const key =
+  process.env.GHOST_CONTENT_KEY ||
+  homepage.match(/data-key="([a-f0-9]+)"/)?.[1];
 if (!key) throw new Error('Public Ghost API key is unavailable.');
 const remote: any[] = [];
 for (const type of ['posts', 'pages']) {

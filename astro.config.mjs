@@ -9,6 +9,7 @@ export default defineConfig({
   trailingSlash: 'always',
   devToolbar: { enabled: false },
   vite: {
+    ssr: { noExternal: ['sanitize-html'] },
     cacheDir:
       process.env.SPARKS_DEV === '1'
         ? 'node_modules/.vite-sparks-dev'
