@@ -8,6 +8,7 @@ const errors: string[] = [];
 const source = 'https://sparks.codezela.com';
 const base = process.argv[2]?.replace(/\/$/, '');
 const originals = [...snapshot.posts, ...snapshot.pages];
+
 const homepage = await fetch('https://sparks-by-codezela.ghost.io').then((r) =>
   r.text(),
 );
@@ -162,6 +163,7 @@ const report = {
   verifiedAt: new Date().toISOString(),
   source,
   base,
+  transport: 'public DNS',
   sourcePosts: snapshot.posts.length,
   sourcePages: snapshot.pages.length,
   liveSourceCount: remote.length,

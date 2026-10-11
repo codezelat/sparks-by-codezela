@@ -1,0 +1,139 @@
+{
+  "verifiedAt": "2026-10-11T17:38:47.587Z",
+  "rows": [
+    {
+      "path": "/",
+      "status": 200,
+      "cache": "public, max-age=0, must-revalidate",
+      "robots": null,
+      "location": null,
+      "contentType": "text/html"
+    },
+    {
+      "path": "/about/",
+      "status": 200,
+      "cache": "public, max-age=0, must-revalidate",
+      "robots": null,
+      "location": null,
+      "contentType": "text/html"
+    },
+    {
+      "path": "/page/1/",
+      "status": 200,
+      "cache": "public, max-age=0, must-revalidate",
+      "robots": null,
+      "location": null,
+      "contentType": "text/html"
+    },
+    {
+      "path": "/page/32/",
+      "status": 200,
+      "cache": "public, max-age=0, must-revalidate",
+      "robots": null,
+      "location": null,
+      "contentType": "text/html"
+    },
+    {
+      "path": "/author/codezela-cc/",
+      "status": 200,
+      "cache": "public, max-age=0, must-revalidate",
+      "robots": null,
+      "location": null,
+      "contentType": "text/html"
+    },
+    {
+      "path": "/author/codezela-cc/page/32/",
+      "status": 200,
+      "cache": "public, max-age=0, must-revalidate",
+      "robots": null,
+      "location": null,
+      "contentType": "text/html"
+    },
+    {
+      "path": "/tag/news/",
+      "status": 200,
+      "cache": "public, max-age=0, must-revalidate",
+      "robots": null,
+      "location": null,
+      "contentType": "text/html"
+    },
+    {
+      "path": "/rss/",
+      "status": 200,
+      "cache": "public, max-age=0, must-revalidate",
+      "robots": null,
+      "location": null,
+      "contentType": "application/rss+xml; charset=utf-8"
+    },
+    {
+      "path": "/sitemap.xml",
+      "status": 200,
+      "cache": "public, max-age=0, must-revalidate",
+      "robots": null,
+      "location": null,
+      "contentType": "application/xml; charset=utf-8"
+    },
+    {
+      "path": "/robots.txt",
+      "status": 200,
+      "cache": "public, max-age=0, must-revalidate",
+      "robots": null,
+      "location": null,
+      "contentType": "text/plain; charset=utf-8"
+    },
+    {
+      "path": "/search/?q=google",
+      "status": 200,
+      "cache": "public, max-age=0, must-revalidate",
+      "robots": null,
+      "location": null,
+      "contentType": "text/html"
+    },
+    {
+      "path": "/private-live-verification/",
+      "status": 404,
+      "cache": "private, no-store",
+      "robots": "noindex, nofollow",
+      "location": null,
+      "contentType": "text/html"
+    },
+    {
+      "path": "/api/studio/articles/",
+      "status": 401,
+      "cache": "private, no-store",
+      "robots": "noindex, nofollow",
+      "location": null,
+      "contentType": "application/json"
+    },
+    {
+      "path": "/api/studio/history/",
+      "status": 401,
+      "cache": "private, no-store",
+      "robots": "noindex, nofollow",
+      "location": null,
+      "contentType": "application/json"
+    },
+    {
+      "path": "/studio/",
+      "status": 303,
+      "cache": "private, no-store",
+      "robots": "noindex, nofollow",
+      "location": "/studio/login/",
+      "contentType": null
+    },
+    {
+      "path": "/sparks-missing-verification/",
+      "status": 404,
+      "cache": "private, no-store",
+      "robots": "noindex, nofollow",
+      "location": null,
+      "contentType": "text/html"
+    }
+  ],
+  "previewNoindex": "noindex, nofollow",
+  "slashlessRedirect": {
+    "status": 308,
+    "location": "/who-are-google-ads-search-partners/"
+  },
+  "errors": []
+}

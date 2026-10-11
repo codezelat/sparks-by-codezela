@@ -17,14 +17,14 @@ The publication owns its content, URLs and media. Visitors receive server-render
 
 ## Architecture
 
-| Layer | Responsibility |
-| --- | --- |
-| Astro 7 | Server-rendered public pages, routes, SEO and private endpoints |
-| React and Tiptap | Studio article list and visual editor |
-| Neon Postgres | Published content, private drafts, revisions, search and administrator records |
-| Vercel | Node server functions, CDN, HTTPS and production deployment |
-| Vercel Blob | New cover and inline image uploads |
-| Repository media | Permanent copies of migrated covers and site assets |
+| Layer            | Responsibility                                                                 |
+| ---------------- | ------------------------------------------------------------------------------ |
+| Astro 7          | Server-rendered public pages, routes, SEO and private endpoints                |
+| React and Tiptap | Studio article list and visual editor                                          |
+| Neon Postgres    | Published content, private drafts, revisions, search and administrator records |
+| Vercel           | Node server functions, CDN, HTTPS and production deployment                    |
+| Vercel Blob      | New cover and inline image uploads                                             |
+| Repository media | Permanent copies of migrated covers and site assets                            |
 
 The public list queries omit article bodies, use indexed dates and taxonomy fields, and run independent count/data queries concurrently. Individual articles fetch their body and related summaries concurrently. Postgres's generated full-text index supports search.
 
@@ -41,16 +41,16 @@ cp .env.example .env
 
 Set your own environment values in `.env`. Real credentials are ignored by Git and must never be copied into documentation.
 
-| Variable | Purpose |
-| --- | --- |
-| `DATABASE_URL` | Neon pooled Postgres connection string |
-| `APP_ORIGIN` | Exact Studio request origin, normally `https://sparks.codezela.com` |
-| `SESSION_SECRET` | Random signing key of at least 32 characters |
-| `ADMIN_EMAIL` | Allowed password administrator, `info@codezela.com` |
-| `BLOB_READ_WRITE_TOKEN` | Project's public Vercel Blob store token |
-| `PUBLIC_GA_ID` | Optional Google Analytics identifier; empty disables analytics |
-| `LOCAL_STUDIO` | Development-only access bypass and embedded Postgres fallback |
-| `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, `GITHUB_ADMIN_IDS` | Optional GitHub OAuth, not required for password login |
+| Variable                                                       | Purpose                                                             |
+| -------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `DATABASE_URL`                                                 | Neon pooled Postgres connection string                              |
+| `APP_ORIGIN`                                                   | Exact Studio request origin, normally `https://sparks.codezela.com` |
+| `SESSION_SECRET`                                               | Random signing key of at least 32 characters                        |
+| `ADMIN_EMAIL`                                                  | Allowed password administrator, `info@codezela.com`                 |
+| `BLOB_READ_WRITE_TOKEN`                                        | Project's public Vercel Blob store token                            |
+| `PUBLIC_GA_ID`                                                 | Optional Google Analytics identifier; empty disables analytics      |
+| `LOCAL_STUDIO`                                                 | Development-only access bypass and embedded Postgres fallback       |
+| `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, `GITHUB_ADMIN_IDS` | Optional GitHub OAuth, not required for password login              |
 
 For development, set `APP_ORIGIN=http://localhost:4321`. With `LOCAL_STUDIO=true`, Studio is available only on loopback in development. If `DATABASE_URL` is set, local publishing changes that database. Use a separate Neon development branch when experimenting with real content. Without a URL, the development-only embedded Postgres store lives under `.local/postgres`.
 
@@ -163,13 +163,15 @@ bun run build
 
 The test suite executes the actual repository SQL against embedded Postgres. It covers draft privacy, search, revision recording, stale saves, immutable published URLs, duplicate slugs, scheduled visibility, history restoration, unpublishing, separate page archives, sanitization, signed sessions and password verification.
 
-While the original Ghost source is available, compare every migrated entry and crawl the hosted site:
+While the original Ghost source is available, supply its public `GHOST_CONTENT_KEY` for the optional comparison if the old hostname redirects to the new site. Then compare every migrated entry and crawl the hosted site:
 
 ```sh
 bun run verify:migration https://sparks.codezela.com
 ```
 
 The script compares bodies, dates, excerpts, taxonomy and SEO fields against the original Content API, checks Neon entries, and crawls all 375 public routes, covers and original sitemap URLs. Reports are saved in `docs/verification`. After Ghost is removed, use the committed migration evidence and normal application checks; the optional source comparison naturally needs its old source to exist.
+
+Run `bun scripts/verify-live.ts` to check public routes and private/cache/indexing headers without contacting the old source. The current [live release evidence](docs/verification/release.md) and [design comparison](docs/design/fidelity-ledger.md) document the verified deployment and intentional differences from the visual concepts.
 
 Screenshots, migration reports and the release report are kept in `docs/verification`. A local build, a Vercel Ready status and a successful live crawl are separate verification steps. Check all three after infrastructure changes.
 

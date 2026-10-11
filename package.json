@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "SPARKS_DEV=1 astro dev --host 127.0.0.1",
-    "build": "astro build",
+    "build": "astro build && bun scripts/verify-build.ts",
     "preview": "astro preview --host 127.0.0.1",
     "check": "astro check",
     "test": "bun test",

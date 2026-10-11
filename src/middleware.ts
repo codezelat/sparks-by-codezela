@@ -2,13 +2,13 @@ import { defineMiddleware } from 'astro:middleware';
 import { getSession } from './lib/auth';
 export const onRequest = defineMiddleware(async (context, next) => {
   const path = context.url.pathname;
+  const under = (root: string) => path === root || path.startsWith(`${root}/`);
   const privatePath =
-    path.startsWith('/studio') ||
-    path.startsWith('/api/studio') ||
-    path.startsWith('/auth');
+    under('/studio') || under('/api/studio') || under('/auth');
   context.locals.session = getSession(context.cookies, context.url);
-  if (path.startsWith('/api/studio') && !context.locals.session)
-    return new Response(JSON.stringify({ error: 'Sign in to continue' }), {
+  let response: Response;
+  if (under('/api/studio') && !context.locals.session)
+    response = new Response(JSON.stringify({ error: 'Sign in to continue' }), {
       status: 401,
       headers: {
         'Content-Type': 'application/json',
@@ -16,13 +16,13 @@ export const onRequest = defineMiddleware(async (context, next) => {
         'X-Robots-Tag': 'noindex, nofollow',
       },
     });
-  if (
-    path.startsWith('/studio') &&
+  else if (
+    under('/studio') &&
     path !== '/studio/login/' &&
     !context.locals.session
   )
-    return context.redirect('/studio/login/', 303);
-  const response = await next();
+    response = context.redirect('/studio/login/', 303);
+  else response = await next();
   response.headers.set('X-Content-Type-Options', 'nosniff');
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   response.headers.set(

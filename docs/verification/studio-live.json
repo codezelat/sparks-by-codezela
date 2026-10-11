@@ -1,0 +1,26 @@
+{
+  "verifiedAt": "2026-10-11T17:39:09.197Z",
+  "login": "info@codezela.com",
+  "workflow": [
+    "signed-in browser",
+    "draft save",
+    "responsive Blob upload",
+    "future publication",
+    "revision history",
+    "unpublish to draft",
+    "private preview"
+  ],
+  "testArticle": {
+    "id": "90c92703-3bf7-463f-9b6b-b4bd8d52cbf1",
+    "version": 3,
+    "private": true
+  },
+  "revisionActions": [
+    "draft",
+    "publish",
+    "unpublish"
+  ],
+  "cleanup": true,
+  "originalDatabaseEntries": 375,
+  "originalMismatches": []
+}

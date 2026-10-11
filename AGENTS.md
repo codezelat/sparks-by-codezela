@@ -49,7 +49,7 @@ Resize and validate uploads independently on the server even when the client alr
 
 Canonical, sitemap, RSS and schema URLs use `https://sparks.codezela.com`. The custom domain is indexable; alternate deployment hosts must remain noindex. Private content, errors and search must remain excluded. Public HTML has a 30-second CDN lifetime; account for it when verifying publishing and scheduling. Do not cache personal Studio responses.
 
-Astro 7/Vercel currently pulls an unused Rolldown import into the server bundle through adapter exports. The narrow `moduleSideEffects` build rule removes that build-only import. Preserve it until an updated adapter is verified live. Never fix this by silently downgrading, shipping the local native binary, or ignoring a live startup failure.
+Astro 7/Vercel currently pulls an unused Rolldown import into the server bundle through adapter exports. The narrow `moduleSideEffects` build rule removes that build-only import. The server bundle also includes the sanitizer dependency tree explicitly because Vercel does not trace generated CommonJS calls correctly. The build guard rejects untraced package requires. Preserve these rules until updated adapters and dependencies are verified live. Never fix this by silently downgrading, shipping the local native binary, or ignoring a live startup failure.
 
 ## Verification and delivery
 

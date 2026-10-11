@@ -9,7 +9,30 @@ export default defineConfig({
   trailingSlash: 'always',
   devToolbar: { enabled: false },
   vite: {
-    ssr: { noExternal: ['sanitize-html'] },
+    ssr: {
+      noExternal:
+        process.env.SPARKS_DEV === '1'
+          ? []
+          : [
+              'sanitize-html',
+              'htmlparser2',
+              'escape-string-regexp',
+              'is-plain-object',
+              'deepmerge',
+              'parse-srcset',
+              'postcss',
+              'launder',
+              'domhandler',
+              'domutils',
+              'domelementtype',
+              'entities',
+              'dom-serializer',
+              'picocolors',
+              'nanoid',
+              'source-map-js',
+              'dayjs',
+            ],
+    },
     cacheDir:
       process.env.SPARKS_DEV === '1'
         ? 'node_modules/.vite-sparks-dev'
