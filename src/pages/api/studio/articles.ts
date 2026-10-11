@@ -68,6 +68,11 @@ export const POST: APIRoute = async ({ request, locals }) => {
     );
     return json({ ...result, article, url: `/${article.slug}/` });
   } catch (error) {
+    console.error('Studio save failed', {
+      name: (error as Error).name,
+      code: (error as { code?: string }).code,
+      message: (error as Error).message,
+    });
     if (error instanceof ConflictError)
       return json({ error: error.message }, 409);
     if ((error as { code?: string }).code === '23505')

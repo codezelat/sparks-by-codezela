@@ -1,0 +1,7 @@
+dist/
+.local/
+.env
+.env.*
+.git/
+docs/
+tests/
