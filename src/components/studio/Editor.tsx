@@ -451,6 +451,10 @@ export default function Editor({
             <span>Publication date</span>
             <input
               type="datetime-local"
+              onInput={(e) => {
+                const value = e.currentTarget.value;
+                if (value) update('publishedAt', new Date(value).toISOString());
+              }}
               value={toLocalDate(article.publishedAt)}
               onChange={(e) => {
                 if (e.target.value)

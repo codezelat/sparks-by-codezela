@@ -8,7 +8,9 @@ const errors: string[] = [];
 const source = 'https://sparks.codezela.com';
 const base = process.argv[2]?.replace(/\/$/, '');
 const originals = [...snapshot.posts, ...snapshot.pages];
-const homepage = await fetch(source).then((r) => r.text());
+const homepage = await fetch('https://sparks-by-codezela.ghost.io').then((r) =>
+  r.text(),
+);
 const key = homepage.match(/data-key="([a-f0-9]+)"/)?.[1];
 if (!key) throw new Error('Public Ghost API key is unavailable.');
 const remote: any[] = [];

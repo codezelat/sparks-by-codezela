@@ -9,7 +9,9 @@ const mediaOverrides = overrides as Record<
 >;
 
 const origin = 'https://sparks.codezela.com';
-const homepage = await fetch(origin).then((r) => r.text());
+const homepage = await fetch('https://sparks-by-codezela.ghost.io').then((r) =>
+  r.text(),
+);
 const key = homepage.match(/data-key="([a-f0-9]+)"/)?.[1];
 if (!key) throw new Error('Public Ghost Content API key not found');
 const api = 'https://sparks-by-codezela.ghost.io/ghost/api/content';
@@ -32,7 +34,9 @@ const [posts, pages, tags, authors, settings] = await Promise.all(
   ['posts', 'pages', 'tags', 'authors', 'settings'].map(read),
 );
 const $ = cheerio.load(
-  await fetch(`${origin}/sitemap-posts.xml`).then((r) => r.text()),
+  await fetch('https://sparks-by-codezela.ghost.io/sitemap-posts.xml').then(
+    (r) => r.text(),
+  ),
   { xml: true },
 );
 const sourceUrls = $('url > loc')

@@ -13,6 +13,14 @@ export default defineConfig({
       process.env.SPARKS_DEV === '1'
         ? 'node_modules/.vite-sparks-dev'
         : 'node_modules/.vite-sparks-build',
+    build: {
+      rolldownOptions: {
+        treeshake: {
+          moduleSideEffects: (id) =>
+            id !== 'rolldown' && !id.includes('/node_modules/rolldown/'),
+        },
+      },
+    },
     server: { allowedHosts: ['localhost', '127.0.0.1'] },
   },
 });
