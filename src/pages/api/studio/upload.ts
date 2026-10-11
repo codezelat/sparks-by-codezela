@@ -29,25 +29,49 @@ export const POST: APIRoute = async ({ request }) => {
         400,
       );
     const bytes = Buffer.from(await file.arrayBuffer());
-    const buffer = await sharp(bytes, { limitInputPixels: 40000000 })
-      .rotate()
-      .resize({ width: 1800, withoutEnlargement: true })
-      .webp({ quality: 85 })
-      .toBuffer();
-    const filename = `media/${crypto.randomUUID()}.webp`;
-    if (localStudio()) {
-      await mkdir('public/media', { recursive: true });
-      await writeFile(`public/${filename}`, buffer);
-      return json({ url: `/${filename}` });
-    }
-    if (!env('BLOB_READ_WRITE_TOKEN'))
-      return json({ error: 'Image storage has not been connected' }, 503);
-    const blob = await put(filename, buffer, {
-      access: 'public',
-      contentType: 'image/webp',
-      token: env('BLOB_READ_WRITE_TOKEN'),
+    const id = crypto.randomUUID();
+    const source = sharp(bytes, { limitInputPixels: 40000000 }).rotate();
+    const files = await Promise.all(
+      [480, 960, 1800].map(async (width) => {
+        const { data, info } = await source
+          .clone()
+          .resize({ width, withoutEnlargement: true })
+          .webp({ quality: 85 })
+          .toBuffer({ resolveWithObject: true });
+        const filename = `media/${id}-${width}.webp`;
+        let url: string;
+        if (localStudio()) {
+          await mkdir('public/media', { recursive: true });
+          await writeFile(`public/${filename}`, data);
+          url = `/${filename}`;
+        } else {
+          if (!env('BLOB_READ_WRITE_TOKEN'))
+            throw new Error('Image storage has not been connected');
+          const blob = await put(filename, data, {
+            access: 'public',
+            contentType: 'image/webp',
+            token: env('BLOB_READ_WRITE_TOKEN'),
+            addRandomSuffix: false,
+          });
+          url = blob.url;
+        }
+        return { url, width: info.width, height: info.height };
+      }),
+    );
+    const full = files[2];
+    const unique = files.filter(
+      (file, index) =>
+        files.findIndex((other) => other.width === file.width) === index,
+    );
+    return json({
+      url: full.url,
+      image: {
+        src: full.url,
+        srcset: unique.map((file) => `${file.url} ${file.width}w`).join(', '),
+        width: full.width,
+        height: full.height,
+      },
     });
-    return json({ url: blob.url });
   } catch {
     return json({ error: 'Image upload failed. Please try again.' }, 400);
   }

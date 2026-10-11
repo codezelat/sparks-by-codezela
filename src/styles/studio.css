@@ -415,13 +415,16 @@
   color: #b42318;
 }
 .link-dialog {
-  position: fixed;
-  inset: 0;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  width: min(600px, calc(100vw - 40px));
+  max-height: 85vh;
+  overflow: auto;
+}
+.link-dialog::backdrop {
   background: #1115;
-  display: grid;
-  place-items: center;
-  z-index: 30;
-  padding: 20px;
+  backdrop-filter: blur(2px);
 }
 .link-dialog > form {
   width: min(480px, 100%);

@@ -12,7 +12,12 @@
     "db:migrate": "bun scripts/migrate.ts",
     "db:seed": "bun scripts/seed.ts",
     "import:ghost": "bun scripts/import-ghost.ts",
-    "admin:create": "bun scripts/create-admin.ts"
+    "admin:create": "bun scripts/create-admin.ts",
+    "admin:password": "bun scripts/reset-password.ts",
+    "db:backup": "bun scripts/backup.ts",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "verify:migration": "bun scripts/verify-migration.ts"
   },
   "dependencies": {
     "@astrojs/react": "^7.0.1",

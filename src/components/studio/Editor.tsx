@@ -1,3 +1,5 @@
+import Modal from './Modal';
+import { optimizedUpload } from './prepare-upload';
 import { useEffect, useRef, useState } from 'react';
 import { useEditor, EditorContent, Extension } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
@@ -206,7 +208,7 @@ export default function Editor({
     setNotice('Uploading image…');
     try {
       const form = new FormData();
-      form.set('file', file);
+      form.set('file', await optimizedUpload(file));
       const response = await fetch('/api/studio/upload/', {
         method: 'POST',
         body: form,
@@ -215,7 +217,10 @@ export default function Editor({
       if (!response.ok) throw new Error(result.error);
       if (inline)
         editor?.chain().focus().setImage({ src: result.url, alt: '' }).run();
-      else update('featureImage', result.url);
+      else {
+        update('featureImage', result.url);
+        update('image', result.image);
+      }
       setNotice('Image uploaded.');
     } catch (e) {
       setError(true);
@@ -489,12 +494,7 @@ export default function Editor({
         </aside>
       </div>
       {historyOpen && (
-        <div
-          className="link-dialog"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="history-title"
-        >
+        <Modal titleId="history-title" onClose={() => setHistoryOpen(false)}>
           <div className="history-panel">
             <h2 id="history-title">Revision history</h2>
             <p className="muted">
@@ -524,14 +524,12 @@ export default function Editor({
               Close
             </button>
           </div>
-        </div>
+        </Modal>
       )}
       {confirmUnpublish && (
-        <div
-          className="link-dialog"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="unpublish-title"
+        <Modal
+          titleId="unpublish-title"
+          onClose={() => setConfirmUnpublish(false)}
         >
           <div className="history-panel">
             <h2 id="unpublish-title">Unpublish article?</h2>
@@ -555,15 +553,10 @@ export default function Editor({
               </button>
             </div>
           </div>
-        </div>
+        </Modal>
       )}
       {linkOpen && (
-        <div
-          className="link-dialog"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="link-title"
-        >
+        <Modal titleId="link-title" onClose={() => setLinkOpen(false)}>
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -610,7 +603,7 @@ export default function Editor({
               </button>
             </div>
           </form>
-        </div>
+        </Modal>
       )}
     </>
   );

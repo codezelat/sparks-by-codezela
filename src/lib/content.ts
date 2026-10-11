@@ -39,6 +39,15 @@ export const articleInput = z
     html: z.string().max(500000),
     excerpt: z.string().max(2000).default(''),
     featureImage: imageUrl.nullable().default(null),
+    image: z
+      .object({
+        src: imageUrl,
+        srcset: z.string().max(8000),
+        width: z.number().int().positive().max(20000),
+        height: z.number().int().positive().max(20000),
+      })
+      .nullable()
+      .optional(),
     featureImageAlt: z.string().max(500).default(''),
     featureImageCaption: z.string().max(2000).default(''),
     metaTitle: z.string().max(300).default(''),
