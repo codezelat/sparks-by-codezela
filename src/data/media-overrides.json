@@ -1,0 +1,6 @@
+{
+  "what-ai-can-do-today": {
+    "source": "https://images.unsplash.com/photo-1718241905696-cb34c2c07bed?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMTc3M3wwfDF8c2VhcmNofDg2fHxBSSUyMHxlbnwwfHx8fDE3NDAzNzQ5OTV8MA&ixlib=rb-4.0.3&q=80&w=2000",
+    "reason": "Original Unsplash cover returns HTTP 404; source-derived AI cover substituted with user authorization."
+  }
+}

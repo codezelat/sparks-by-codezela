@@ -1,0 +1,8 @@
+---
+import Studio from '../../layouts/Studio.astro';
+import ArticleList from '../../components/studio/ArticleList';
+import {database} from '../../lib/db';
+import {repository} from '../../lib/repository';
+const initial=await repository(await database()).studioList(1,'','','page');
+---
+<Studio title="Pages | Sparks Studio"><ArticleList initial={initial} kind="page" client:load/></Studio>

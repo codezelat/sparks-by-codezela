@@ -1,0 +1,9 @@
+---
+import Base from '../layouts/Base.astro';
+import ArticleRow from './ArticleRow.astro';
+import {site} from '../lib/site';
+import type {ArticleSummary} from '../lib/content';
+interface Props {name:string;articles:ArticleSummary[];total:number;page:number;base:string;description?:string;}
+const {name,articles,total,page,base,description}=Astro.props;
+---
+<Base title={`${name}${page>1?`, page ${page}`:''} | ${site.name}`} description={description} canonical={`https://sparks.codezela.com${base}${page>1?`page/${page}/`:''}`}><section class="shell"><div class="archive-head"><h1 class="page-heading">{name}</h1><p>{total} articles</p></div>{articles.map(article=><ArticleRow article={article}/>)}<nav class="pagination" aria-label="Pagination"><span>{page>1&&<a href={page===2?base:`${base}page/${page-1}/`}>Previous</a>}</span><span class="muted">{page} / {Math.max(1,Math.ceil(total/12))}</span><span>{page*12<total&&<a href={`${base}page/${page+1}/`}>Next</a>}</span></nav></section></Base>

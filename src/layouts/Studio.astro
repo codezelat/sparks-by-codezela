@@ -1,0 +1,9 @@
+---
+import '@fontsource-variable/inter';
+import '../styles/global.css';
+import '../styles/studio.css';
+import {site} from '../lib/site';
+import {localStudio} from '../lib/db';
+const {title='Sparks Studio'}=Astro.props;
+---
+<!doctype html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="robots" content="noindex, nofollow"/><title>{title}</title><link rel="icon" href={site.icon}/></head><body class="studio-body"><a class="skip-link" href="#main">Skip to content</a><header class="studio-header"><div class="studio-brand"><a href="/studio/">sparks<span class="brand-dot">.</span></a><span>Studio</span></div><nav aria-label="Studio navigation">{Astro.locals.session&&<a href="/studio/">Articles</a>}{Astro.locals.session&&<a href="/studio/pages/">Pages</a>}{localStudio()&&<span class="local-label">Local development</span>}<a href="/">View site</a>{!localStudio()&&Astro.locals.session&&<form action="/auth/logout/" method="post"><button>Sign out</button></form>}</nav></header><main id="main" class="studio-shell"><slot/></main></body></html>

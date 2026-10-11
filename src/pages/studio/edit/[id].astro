@@ -1,0 +1,9 @@
+---
+import Studio from '../../../layouts/Studio.astro';
+import Editor from '../../../components/studio/Editor';
+import {repository} from '../../../lib/repository';
+import {database} from '../../../lib/db';
+const record=await repository(await database()).studioGet(Astro.params.id!);
+if(!record)return Astro.redirect('/studio/',303);
+---
+<Studio title="Edit article | Sparks Studio"><Editor id={record.id} initial={record.draft||record.published!} initialVersion={record.version} isPublished={Boolean(record.published)} client:only="react"/></Studio>

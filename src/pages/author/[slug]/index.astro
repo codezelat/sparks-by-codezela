@@ -1,0 +1,7 @@
+---
+import Archive from '../../../components/Archive.astro';
+import {listArticles,authors} from '../../../lib/site';
+const author=authors.find(t=>t.slug===Astro.params.slug);if(!author)return Astro.redirect('/404/',302);
+const result=await listArticles({author:author.slug});
+---
+<Archive name={author.name} {...result} page={1} base={`/author/${author.slug}/`} description={author.bio||undefined}/>

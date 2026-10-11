@@ -1,0 +1,6 @@
+---
+import type {ArticleSummary} from '../lib/content';
+interface Props {article:ArticleSummary;priority?:boolean;class?:string;sizes?:string;}
+const {article,priority=false,class:className='',sizes='(max-width: 700px) 100vw, 50vw'}=Astro.props;
+---
+{article.featureImage&&<img class={className} src={article.featureImage} srcset={article.image?.srcset || undefined} sizes={sizes} width={article.image?.width||1600} height={article.image?.height||900} alt={article.featureImageAlt||article.title} loading={priority?'eager':'lazy'} decoding="async" fetchpriority={priority?'high':'auto'}/>}

@@ -1,0 +1,8 @@
+---
+import Studio from '../../layouts/Studio.astro';
+import ArticleList from '../../components/studio/ArticleList';
+import {database} from '../../lib/db';
+import {repository} from '../../lib/repository';
+let initial;try{initial=await repository(await database()).studioList();}catch{Astro.response.status=503;}
+---
+<Studio>{initial?<ArticleList initial={initial} client:load/>:<section class="studio-login"><h1>Studio is unavailable</h1><p>The content database could not be reached. Please try again.</p><a href="/studio/" class="button">Try again</a></section>}</Studio>

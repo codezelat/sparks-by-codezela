@@ -1,0 +1,9 @@
+---
+import Base from '../layouts/Base.astro';
+import ArticleRow from '../components/ArticleRow.astro';
+import {listArticles,site} from '../lib/site';
+const q=(Astro.url.searchParams.get('q')||'').trim().slice(0,200);
+const page=Math.max(1,Math.min(10000,Number(Astro.url.searchParams.get('page'))||1));
+const {articles,total}=q?await listArticles({search:q,page,limit:12}):{articles:[],total:0};
+---
+<Base title={`Search | ${site.name}`} noindex><section class="shell"><h1 class="page-heading">Search</h1><form class="search-page-form" action="/search/" method="get"><label class="sr-only" for="query">Search articles</label><input id="query" name="q" type="search" placeholder="Search articles" value={q} maxlength="200"/><button type="submit">Search</button></form>{q&&<p class="muted">{total?`${total} ${total===1?'article':'articles'}`:'No articles found'}</p>}{articles.map(article=><ArticleRow article={article}/>)}{q&&<nav class="pagination" aria-label="Search pagination"><span>{page>1&&<a href={`/search/?q=${encodeURIComponent(q)}&page=${page-1}`}>Previous</a>}</span><span>{page*12<total&&<a href={`/search/?q=${encodeURIComponent(q)}&page=${page+1}`}>Next</a>}</span></nav>}</section></Base>
