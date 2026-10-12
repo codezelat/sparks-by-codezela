@@ -1,0 +1,70 @@
+{
+  "verifiedAt": "2026-10-12T09:48:04.695Z",
+  "measurementId": "G-1FHLXFGZRV",
+  "rows": [
+    {
+      "url": "https://sparks.codezela.com/",
+      "status": 200,
+      "enabled": true,
+      "loaders": 1,
+      "configurations": 1,
+      "passed": true
+    },
+    {
+      "url": "https://sparks.codezela.com/about/",
+      "status": 200,
+      "enabled": true,
+      "loaders": 1,
+      "configurations": 1,
+      "passed": true
+    },
+    {
+      "url": "https://sparks.codezela.com/who-are-google-ads-search-partners/",
+      "status": 200,
+      "enabled": true,
+      "loaders": 1,
+      "configurations": 1,
+      "passed": true
+    },
+    {
+      "url": "https://sparks.codezela.com/author/codezela-cc/",
+      "status": 200,
+      "enabled": true,
+      "loaders": 1,
+      "configurations": 1,
+      "passed": true
+    },
+    {
+      "url": "https://sparks.codezela.com/studio/login/",
+      "status": 200,
+      "enabled": false,
+      "loaders": 0,
+      "configurations": 0,
+      "passed": true
+    },
+    {
+      "url": "https://sparks.codezela.com/search/",
+      "status": 200,
+      "enabled": false,
+      "loaders": 0,
+      "configurations": 0,
+      "passed": true
+    },
+    {
+      "url": "https://sparks.codezela.com/sparks-missing-verification/",
+      "status": 404,
+      "enabled": false,
+      "loaders": 0,
+      "configurations": 0,
+      "passed": true
+    },
+    {
+      "url": "https://sparks-by-codezela.vercel.app/",
+      "status": 200,
+      "enabled": false,
+      "loaders": 0,
+      "configurations": 0,
+      "passed": true
+    }
+  ]
+}

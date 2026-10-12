@@ -1,0 +1,60 @@
+{
+  "verifiedAt": "2026-10-12T09:48:40.026Z",
+  "deployment": "dpl_5omZjXxVZ3bqJvn7pcETirxN24nz",
+  "measurementId": "G-1FHLXFGZRV",
+  "home": [
+    {
+      "method": "Network.requestWillBeSent",
+      "requestId": "27964.22",
+      "host": "www.googletagmanager.com",
+      "path": "/gtag/js",
+      "measurementId": "G-1FHLXFGZRV",
+      "event": null,
+      "page": null
+    },
+    {
+      "method": "Network.responseReceived",
+      "requestId": "27964.22",
+      "host": "www.googletagmanager.com",
+      "path": "/gtag/js",
+      "measurementId": "G-1FHLXFGZRV",
+      "event": null,
+      "status": 200,
+      "page": null
+    },
+    {
+      "method": "Network.requestWillBeSent",
+      "requestId": "27964.46",
+      "host": "www.google-analytics.com",
+      "path": "/g/collect",
+      "measurementId": "G-1FHLXFGZRV",
+      "event": "page_view",
+      "page": "https://sparks.codezela.com/"
+    },
+    {
+      "method": "Network.responseReceived",
+      "requestId": "27964.46",
+      "host": "www.google-analytics.com",
+      "path": "/g/collect",
+      "measurementId": "G-1FHLXFGZRV",
+      "event": "page_view",
+      "status": 204,
+      "page": "https://sparks.codezela.com/"
+    }
+  ],
+  "article": [
+    {
+      "method": "Network.requestWillBeSent",
+      "measurementId": "G-1FHLXFGZRV",
+      "event": "page_view",
+      "page": "https://sparks.codezela.com/who-are-google-ads-search-partners/"
+    },
+    {
+      "method": "Network.responseReceived",
+      "measurementId": "G-1FHLXFGZRV",
+      "event": "page_view",
+      "status": 204,
+      "page": "https://sparks.codezela.com/who-are-google-ads-search-partners/"
+    }
+  ]
+}

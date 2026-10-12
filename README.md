@@ -48,11 +48,13 @@ Set your own environment values in `.env`. Real credentials are ignored by Git a
 | `SESSION_SECRET`                                               | Random signing key of at least 32 characters                        |
 | `ADMIN_EMAIL`                                                  | Allowed password administrator, `info@codezela.com`                 |
 | `BLOB_READ_WRITE_TOKEN`                                        | Project's public Vercel Blob store token                            |
-| `PUBLIC_GA_ID`                                                 | Optional Google Analytics identifier; empty disables analytics      |
+| `PUBLIC_GA_ID`                                                 | Google Analytics ID `G-1FHLXFGZRV`; empty disables analytics        |
 | `LOCAL_STUDIO`                                                 | Development-only access bypass and embedded Postgres fallback       |
 | `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, `GITHUB_ADMIN_IDS` | Optional GitHub OAuth, not required for password login              |
 
 For development, set `APP_ORIGIN=http://localhost:4321`. With `LOCAL_STUDIO=true`, Studio is available only on loopback in development. If `DATABASE_URL` is set, local publishing changes that database. Use a separate Neon development branch when experimenting with real content. Without a URL, the development-only embedded Postgres store lives under `.local/postgres`.
+
+Google Analytics uses the asynchronous Google tag with measurement ID `G-1FHLXFGZRV`, configured as `PUBLIC_GA_ID` in Vercel Production. It records normal page views once per document on indexable pages at `sparks.codezela.com`. Studio, draft previews, search/error pages, local development and alternate deployment hosts do not load the tag. Change the production variable and redeploy to use another property; leave it empty to disable analytics. Check the property's Realtime report to view visits. No administrator credentials or draft content are included in analytics.
 
 ```sh
 bun run db:migrate

@@ -38,6 +38,12 @@ const {
 } = Astro.props;
 const absolute = (url: string) => new URL(url, origin).href;
 const ga = import.meta.env.PUBLIC_GA_ID;
+const analyticsEnabled =
+  import.meta.env.PROD &&
+  Astro.url.hostname === 'sparks.codezela.com' &&
+  !noindex &&
+  Astro.response.status === 200 &&
+  Boolean(ga && /^G-[A-Z0-9]+$/.test(ga));
 ---
 
 <!doctype html>
@@ -84,7 +90,7 @@ const ga = import.meta.env.PUBLIC_GA_ID;
         set:html={JSON.stringify(schema).replace(/</g, '\\u003c')}
       />
     )}
-    {ga && /^G-[A-Z0-9]+$/.test(ga) && (
+    {analyticsEnabled && (
       <>
         <script
           is:inline
