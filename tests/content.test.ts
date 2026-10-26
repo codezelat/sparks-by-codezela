@@ -1,7 +1,34 @@
 import { describe, it, expect } from 'bun:test';
 import { articleInput, safeHtml, plaintext } from '../src/lib/content';
 import { signToken, verifyToken } from '../src/lib/auth';
+import { spawnSync } from 'node:child_process';
 describe('Editorial content safety', () => {
+  it('handles discarded iframe nesting without overflowing the production Node stack', () => {
+    const result = spawnSync(
+      'node',
+      [
+        '--input-type=module',
+        '-e',
+        `import assert from 'node:assert/strict';
+        import { safeHtml } from './src/lib/content.ts';
+        for (const input of [
+          '<iframe>'.repeat(4000),
+          ('<iframe><b><b><b>').repeat(1000) + 'text',
+        ]) {
+          const output = safeHtml(input);
+          assert.ok(!output.includes('<iframe'));
+        }
+        assert.equal(
+          safeHtml('<h2 id="intro">Introduction</h2><p>Hello <strong>reader</strong>.</p>'),
+          '<h2 id="intro">Introduction</h2><p>Hello <strong>reader</strong>.</p>',
+        );`,
+      ],
+      { encoding: 'utf8', timeout: 10000 },
+    );
+    expect(result.error).toBeUndefined();
+    expect(result.stderr).toBe('');
+    expect(result.status).toBe(0);
+  });
   it('keeps headings, anchors and content while removing executable HTML', () => {
     const html = safeHtml(
       '<h2 id="intro">Introduction</h2><p>Hello <strong>reader</strong>.</p><script>alert(1)</script><img src="x" onerror="alert(1)"><a href="javascript:alert(1)">Bad</a>',
