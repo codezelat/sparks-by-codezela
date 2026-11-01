@@ -1,0 +1,84 @@
+{
+  "verifiedAt": "2026-11-01T03:19:04.170Z",
+  "adminLogin": true,
+  "id": "compute-check-9819c680-4f18-4896-ac43-b194a4214b28",
+  "checks": [
+    {
+      "path": "/",
+      "status": 200,
+      "data": "HIT",
+      "cache": "REVALIDATED",
+      "generation": "7331dadf-31ad-49fa-98fa-417cda71c646"
+    },
+    {
+      "path": "/about/",
+      "status": 200,
+      "data": "HIT",
+      "cache": "MISS",
+      "generation": "7331dadf-31ad-49fa-98fa-417cda71c646"
+    },
+    {
+      "path": "/page/2/",
+      "status": 200,
+      "data": "HIT",
+      "cache": "MISS",
+      "generation": "7331dadf-31ad-49fa-98fa-417cda71c646"
+    },
+    {
+      "path": "/author/codezela-cc/",
+      "status": 200,
+      "data": "HIT",
+      "cache": "MISS",
+      "generation": "7331dadf-31ad-49fa-98fa-417cda71c646"
+    },
+    {
+      "path": "/tag/news/",
+      "status": 200,
+      "data": "HIT",
+      "cache": "MISS",
+      "generation": "7331dadf-31ad-49fa-98fa-417cda71c646"
+    },
+    {
+      "path": "/rss/",
+      "status": 200,
+      "data": "HIT",
+      "cache": "MISS",
+      "generation": "7331dadf-31ad-49fa-98fa-417cda71c646"
+    },
+    {
+      "path": "/sitemap.xml",
+      "status": 200,
+      "data": "HIT",
+      "cache": "MISS",
+      "generation": "7331dadf-31ad-49fa-98fa-417cda71c646"
+    },
+    {
+      "path": "/api/search/?q=google",
+      "status": 200,
+      "data": "HIT",
+      "cache": "MISS",
+      "generation": "7331dadf-31ad-49fa-98fa-417cda71c646"
+    }
+  ],
+  "before": {
+    "status": 200,
+    "data": "HIT",
+    "generation": "5ff6f029-0203-4915-bbd4-aeca3863ce53"
+  },
+  "published": {
+    "status": 200,
+    "visible": true,
+    "generation": "ce7f6037-6240-4870-8dfa-71de74f5920a"
+  },
+  "edge": {
+    "status": 200,
+    "cache": "REVALIDATED",
+    "age": "0"
+  },
+  "unpublished": {
+    "status": 404,
+    "cache": "REVALIDATED"
+  },
+  "success": true,
+  "testContentRemoved": true
+}

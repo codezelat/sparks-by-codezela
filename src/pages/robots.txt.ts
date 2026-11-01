@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { origin } from '../lib/site';
+export const prerender = true;
 export const GET: APIRoute = () =>
   new Response(
     `User-agent: *\nAllow: /\nDisallow: /studio/\nDisallow: /auth/\nDisallow: /api/\nDisallow: /search/\nSitemap: ${origin}/sitemap.xml\n`,

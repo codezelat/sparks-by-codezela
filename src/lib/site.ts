@@ -2,12 +2,28 @@ import metadata from '../data/site.json';
 import { database, hasDatabase } from './db';
 import { repository } from './repository';
 import { summary, type Article } from './content';
+import { publicationCache, publicCacheEnabled } from './publication';
+import { publicationView } from './publication-view';
 export const site = metadata.site;
 export const authors = metadata.authors;
 export const tags = metadata.tags;
 export const pages = metadata.pages as Article[];
 export const origin = 'https://sparks.codezela.com';
+let cachedView:
+  { generation: string; view: ReturnType<typeof publicationView> } | undefined;
+async function publicView() {
+  if (!publicCacheEnabled()) return;
+  const snapshot = await publicationCache.load();
+  if (cachedView?.generation !== snapshot.generation)
+    cachedView = {
+      generation: snapshot.generation,
+      view: publicationView(snapshot.articles),
+    };
+  return cachedView!.view;
+}
 export async function latestArticles(limit = 4) {
+  const view = await publicView();
+  if (view) return view.latest(limit);
   if (hasDatabase()) return repository(await database()).latest(limit);
   return (await listArticles({ limit })).articles;
 }
@@ -20,6 +36,8 @@ export async function listArticles(
     author?: string;
   } = {},
 ) {
+  const view = await publicView();
+  if (view) return view.list(options);
   if (hasDatabase()) return repository(await database()).list(options);
   if (!import.meta.env.DEV && process.env.CONTENT_SOURCE !== 'snapshot')
     throw new Error('Configure DATABASE_URL for the public site.');
@@ -41,10 +59,14 @@ export async function listArticles(
   };
 }
 export async function getPage(slug: string) {
+  const view = await publicView();
+  if (view) return view.get(slug);
   if (hasDatabase()) return repository(await database()).get(slug);
   return pages.find((p) => p.slug === slug);
 }
 export async function getArticle(slug: string) {
+  const view = await publicView();
+  if (view) return view.get(slug);
   if (hasDatabase()) return repository(await database()).get(slug);
   if (!import.meta.env.DEV && process.env.CONTENT_SOURCE !== 'snapshot')
     throw new Error('Configure DATABASE_URL for the public site.');
@@ -54,6 +76,8 @@ export async function getArticle(slug: string) {
   );
 }
 export async function articleUrls() {
+  const view = await publicView();
+  if (view) return view.urls();
   if (hasDatabase()) return repository(await database()).urls();
   if (!import.meta.env.DEV && process.env.CONTENT_SOURCE !== 'snapshot')
     throw new Error('Configure DATABASE_URL for the public site.');
@@ -69,6 +93,8 @@ export async function articleUrls() {
 }
 
 export async function pageUrls() {
+  const view = await publicView();
+  if (view) return view.pageUrls();
   if (hasDatabase()) return repository(await database()).pageUrls();
   return pages.map((p) => ({ slug: p.slug, updatedAt: p.updatedAt }));
 }

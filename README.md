@@ -26,9 +26,15 @@ The publication owns its content, URLs and media. Visitors receive server-render
 | Vercel Blob      | New cover and inline image uploads                                             |
 | Repository media | Permanent copies of migrated covers and site assets                            |
 
-The public list queries omit article bodies, use indexed dates and taxonomy fields, and run independent count/data queries concurrently. Individual articles fetch their body and related summaries concurrently. Postgres's generated full-text index supports search.
+Production public reads share a private Vercel Runtime Cache of published records with a six-hour lifetime. One database query fills that cache; distinct article URLs, archives, unknown URLs, search queries, RSS and the sitemap reuse it. The content is compressed and split into entries below Vercel's 2 MB item limit. A small version pointer lets warm functions reuse decoded content, and concurrent loads in a function share one query. There is no polling, keep-alive query or scheduled cache warmer. Neon remains the editorial source of truth for Studio, drafts, history and account access.
 
-Public HTML has a 30-second Vercel CDN lifetime. Studio, auth, private previews, write endpoints and errors use `no-store`. Publishing, updates, unpublishing and scheduled articles can therefore take up to 30 seconds to appear consistently in cached public views. Static build assets have immutable caching.
+Public HTML has a 24-hour Vercel CDN lifetime, capped at the next scheduled publication time. Publishing or unpublishing synchronously rebuilds the shared dataset and purges tagged public responses. Draft saves and revision restoration leave public content unchanged. Other downstream CDNs have a maximum 30-second lifetime; browsers must revalidate. Studio, auth, previews, mutations and errors remain `no-store`. Static build assets have immutable caching.
+
+Scheduled records exist only inside the private server cache and are filtered at request time from articles, search, archives and feeds until their publication date arrives. Full-text search runs in a server-side MiniSearch index with title/excerpt boosting; typed search terms do not issue SQL queries. Public lists continue to omit bodies. No publication data is exposed through a public snapshot file.
+
+With normal cache retention, public traffic needs roughly four dataset queries per day in the configured single function region, plus publication changes. Cache eviction, additional regions, Studio activity and other database clients can increase that count. This reduces database wake-ups; it is not a promise of a particular monthly bill. Keep Neon's Scale to zero enabled and use its smallest appropriate compute size. Monitor actual CU-hours after deployment. A cached response alone does not reduce usage caused by unrelated clients, open transactions or provider settings.
+
+`X-Sparks-Data-Cache` reports the data-cache result for a rendered response; `X-Sparks-Publication` identifies its dataset version. `x-vercel-cache: HIT` shows an edge response that did not run the server. A cached HTML response can retain the data-cache header from its original render. Check runtime logs for `Publication cache database refresh` when investigating cold fills. Cache entries are isolated by Vercel environment and a project-specific namespace. Publishing reports a visible warning if refresh fails, while retaining the successful database save; publish again to retry. Direct SQL edits, seed/restore operations or external publishing tools must be followed by a Studio publication refresh, or wait for the six-hour data-cache expiry.
 
 ## Local setup
 
@@ -93,7 +99,7 @@ This updates the configured account and replaces the private credential file. Ex
 
 Existing published articles keep their URL. **Save draft** keeps edits private while the current published version remains visible. **Update** publishes the edited version. The editor warns before closing a tab with unsaved edits and reports failed saves explicitly.
 
-**History and publishing** shows the latest 50 revisions. Restoring a revision saves it as a draft; publishing that draft is a separate action. **Unpublish** preserves the content as a draft and removes it from public queries, search, RSS and the sitemap. Its public URL then returns 404 after the CDN cache expires. Concurrent saves from an older tab are rejected rather than overwriting newer work.
+**History and publishing** shows the latest 50 revisions. Restoring a revision saves it as a draft; publishing that draft is a separate action. **Unpublish** preserves the content as a draft, refreshes the public cache, and removes it from search, RSS and the sitemap. Its public URL then returns 404, with a maximum 30-second delay at downstream CDNs. Concurrent saves from an older tab are rejected rather than overwriting newer work.
 
 Select **Pages** to edit About or create another public page. Pages share the same draft and publishing workflow and are listed in the sitemap; article archives and RSS only contain articles.
 

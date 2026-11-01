@@ -33,6 +33,8 @@ Article covers preserve their full aspect ratio. Compact archive thumbnails may 
 - Use parameterized queries. Protect content with the shared Zod schema and server-side HTML sanitization.
 - Public queries return only published entries whose publication date has arrived. Drafts and private revisions must never appear in public search, RSS, sitemap or archives.
 - Public lists return summaries without bodies. Keep the date, full-text and taxonomy indexes aligned with query changes.
+- Production public reads use the private compressed publication cache in `src/lib/publication*.ts`. Do not put per-page, per-search or unknown-URL database reads back into these paths. Neon is refreshed once per shared six-hour dataset lifetime and after publishing/unpublishing. Keep the project-specific namespace, bounded cache shards and request-time scheduled-content filters.
+- A successful publish or unpublish must refresh the dataset and purge the public CDN tag. Draft saves and revision restoration must leave the current public dataset unchanged. Keep the SQL save result/version even if cache refresh fails, show the refresh warning, and allow retry. Do not export drafts or future articles to public Blob storage.
 - Preserve the optimistic version check and atomic revision write. A stale editor cannot overwrite newer work.
 - Published URLs remain protected. Do not silently rename migrated articles or remove the original canonical override.
 - Save draft leaves the current published article untouched. Revision restoration also creates a private draft.
@@ -47,7 +49,7 @@ Require the shared administrator session for every Studio page and API. Check th
 
 Resize and validate uploads independently on the server even when the client already prepares them. Keep the request within Vercel's body limits, validate actual image decoding, restrict formats/pixels, and preserve dimensions and responsive variants in article metadata. Vercel Blob is public media storage, not secret-file storage.
 
-Canonical, sitemap, RSS and schema URLs use `https://sparks.codezela.com`. The custom domain is indexable; alternate deployment hosts must remain noindex. Private content, errors and search must remain excluded. Public HTML has a 30-second CDN lifetime; account for it when verifying publishing and scheduling. Do not cache personal Studio responses.
+Canonical, sitemap, RSS and schema URLs use `https://sparks.codezela.com`. The custom domain is indexable; alternate deployment hosts must remain noindex. Private content, errors and search must remain excluded from indexing. Public responses use up to 24 hours at Vercel, capped at the next scheduled publication, with tag purging after public changes. Downstream CDNs retain a 30-second maximum. Do not cache personal Studio responses. Inspect the actual public cache headers and test a previously cached URL after unpublishing.
 
 Astro 7/Vercel currently pulls an unused Rolldown import into the server bundle through adapter exports. The narrow `moduleSideEffects` build rule removes that build-only import. The server bundle also includes the sanitizer dependency tree explicitly because Vercel does not trace generated CommonJS calls correctly. The build guard rejects untraced package requires. Preserve these rules until updated adapters and dependencies are verified live. Never fix this by silently downgrading, shipping the local native binary, or ignoring a live startup failure.
 

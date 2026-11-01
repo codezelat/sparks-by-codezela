@@ -1,11 +1,15 @@
 import { defineMiddleware } from 'astro:middleware';
-import { getSession } from './lib/auth';
+import { addCacheTag } from '@vercel/functions';
+import { publicationCache, publicCacheEnabled } from './lib/publication';
+import { PUBLICATION_TAG } from './lib/publication-cache';
 export const onRequest = defineMiddleware(async (context, next) => {
   const path = context.url.pathname;
   const under = (root: string) => path === root || path.startsWith(`${root}/`);
   const privatePath =
     under('/studio') || under('/api/studio') || under('/auth');
-  context.locals.session = getSession(context.cookies, context.url);
+  context.locals.session = privatePath
+    ? (await import('./lib/auth')).getSession(context.cookies, context.url)
+    : null;
   let response: Response;
   if (under('/api/studio') && !context.locals.session)
     response = new Response(JSON.stringify({ error: 'Sign in to continue' }), {
@@ -45,9 +49,22 @@ export const onRequest = defineMiddleware(async (context, next) => {
     response.headers.set('Cache-Control', 'private, no-store');
     response.headers.set('Vercel-CDN-Cache-Control', 'no-store');
     response.headers.set('X-Robots-Tag', 'noindex, nofollow');
-  } else if (context.request.method === 'GET') {
+  } else if (['GET', 'HEAD'].includes(context.request.method)) {
     response.headers.set('Cache-Control', 'public, max-age=0, must-revalidate');
-    response.headers.set('Vercel-CDN-Cache-Control', 'public, s-maxage=30');
+    response.headers.set('CDN-Cache-Control', 'public, s-maxage=30');
+    response.headers.set(
+      'Vercel-CDN-Cache-Control',
+      `public, s-maxage=${Math.min(publicationCache.sharedMaxAge(), publicationCache.diagnostics().source === 'BYPASS' ? 30 : 86400)}`,
+    );
+    if (publicCacheEnabled()) {
+      await addCacheTag(PUBLICATION_TAG);
+      response.headers.set(
+        'X-Sparks-Data-Cache',
+        publicationCache.diagnostics().source,
+      );
+      const generation = publicationCache.diagnostics().generation;
+      if (generation) response.headers.set('X-Sparks-Publication', generation);
+    }
   }
   return response;
 });

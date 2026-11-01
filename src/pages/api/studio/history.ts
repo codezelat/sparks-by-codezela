@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import { database } from '../../../lib/db';
 import { repository, ConflictError } from '../../../lib/repository';
 import { validMutation } from '../../../lib/auth';
+import { refreshPublication } from '../../../lib/publication';
 const json = (data: unknown, status = 200) =>
   new Response(JSON.stringify(data), {
     status,
@@ -30,8 +31,11 @@ export const POST: APIRoute = async ({ request, locals }) => {
     )
       return json({ error: 'Invalid request' }, 400);
     const repo = repository(await database());
-    if (action === 'unpublish')
-      return json(await repo.unpublish(id, version, locals.session!.id));
+    if (action === 'unpublish') {
+      const result = await repo.unpublish(id, version, locals.session!.id);
+      const warning = await refreshPublication();
+      return json({ ...result, warning });
+    }
     if (action === 'restore' && /^\d{1,20}$/.test(revisionId || ''))
       return json(
         await repo.restore(id, revisionId, version, locals.session!.id),

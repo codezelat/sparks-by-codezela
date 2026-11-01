@@ -7,9 +7,10 @@ const page = Math.max(
   1,
   Math.min(10000, Number(Astro.url.searchParams.get('page')) || 1),
 );
-const { articles, total } = q
-  ? await listArticles({ search: q, page, limit: 12 })
-  : { articles: [], total: 0 };
+const { articles, total } =
+  q.length >= 2
+    ? await listArticles({ search: q, page, limit: 12 })
+    : { articles: [], total: 0 };
 ---
 
 <Base title={`Search | ${site.name}`} noindex>
@@ -26,6 +27,7 @@ const { articles, total } = q
         placeholder="Search articles"
         value={q}
         maxlength="200"
+        minlength="2"
       />
       <button type="submit">Search</button>
     </form>

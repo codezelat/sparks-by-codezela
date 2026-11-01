@@ -3,6 +3,7 @@ import { database } from '../../../lib/db';
 import { repository, ConflictError } from '../../../lib/repository';
 import { articleInput, prepareArticle } from '../../../lib/content';
 import { validMutation } from '../../../lib/auth';
+import { refreshPublication } from '../../../lib/publication';
 const json = (value: unknown, status = 200) =>
   new Response(JSON.stringify(value), {
     status,
@@ -66,7 +67,9 @@ export const POST: APIRoute = async ({ request, locals }) => {
       body.action,
       locals.session!.id,
     );
-    return json({ ...result, article, url: `/${article.slug}/` });
+    const warning =
+      body.action === 'publish' ? await refreshPublication() : undefined;
+    return json({ ...result, article, url: `/${article.slug}/`, warning });
   } catch (error) {
     console.error('Studio save failed', {
       name: (error as Error).name,

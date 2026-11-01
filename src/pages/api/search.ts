@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro';
 import { listArticles } from '../../lib/site';
 export const GET: APIRoute = async ({ url }) => {
   const q = url.searchParams.get('q')?.trim().slice(0, 200) || '';
-  if (!q) return Response.json({ articles: [], total: 0 });
+  if (q.length < 2) return Response.json({ articles: [], total: 0 });
   try {
     const { articles, total } = await listArticles({ search: q, limit: 10 });
     return Response.json({

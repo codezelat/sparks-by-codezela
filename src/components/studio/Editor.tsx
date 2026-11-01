@@ -106,6 +106,15 @@ export default function Editor({
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error);
+      if (result.warning) {
+        setConfirmUnpublish(false);
+        setVersion(result.version);
+        setPublished(false);
+        setError(true);
+        setNotice(result.warning);
+        setBusy(false);
+        return;
+      }
       window.location.reload();
     } catch (e) {
       setError(true);
@@ -187,12 +196,14 @@ export default function Editor({
       contentChanged.current = false;
       if (action === 'publish') setPublished(true);
       setNotice(
-        action === 'publish'
-          ? new Date(data.publishedAt) > new Date()
-            ? 'Scheduled for the publication date.'
-            : 'Published.'
-          : 'Draft saved.',
+        result.warning ||
+          (action === 'publish'
+            ? new Date(data.publishedAt) > new Date()
+              ? 'Scheduled for the publication date.'
+              : 'Published.'
+            : 'Draft saved.'),
       );
+      if (result.warning) setError(true);
       if (window.location.pathname === '/studio/new/')
         window.history.replaceState(null, '', `/studio/edit/${id}/`);
     } catch (e) {
@@ -539,7 +550,7 @@ export default function Editor({
             <h2 id="unpublish-title">Unpublish article?</h2>
             <p>
               The article will become a draft and its public URL will return
-              404. Cached pages can remain visible for up to 30 seconds.
+              404. The public site will refresh automatically.
             </p>
             <div className="actions">
               <button

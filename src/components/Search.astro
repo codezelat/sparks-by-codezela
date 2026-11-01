@@ -20,6 +20,7 @@ import Icon from './Icon.astro';
       placeholder="Search articles"
       autocomplete="off"
       maxlength="200"
+      minlength="2"
     />
     <button class="sr-only" type="submit">
       Search
@@ -69,6 +70,10 @@ import Icon from './Icon.astro';
         status.textContent = 'Search posts, tags and authors';
         return;
       }
+      if (q.length < 2) {
+        status.textContent = 'Type at least 2 characters.';
+        return;
+      }
       status.textContent = 'Searching…';
       timer = setTimeout(async () => {
         controller = new AbortController();
@@ -97,7 +102,7 @@ import Icon from './Icon.astro';
           if ((e as Error).name !== 'AbortError')
             status.textContent = 'Search is unavailable. Please try again.';
         }
-      }, 200);
+      }, 300);
     });
   }
 </script>
