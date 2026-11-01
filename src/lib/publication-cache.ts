@@ -9,7 +9,12 @@ export const PUBLIC_HTML_TTL = 24 * 3600;
 const POINTER = 'publication-v1';
 const LAST_GOOD = 'publication-last-good-v1';
 const RETENTION = 30 * 86400;
-type Pointer = { generation: string; expiresAt: number; parts: number };
+type Pointer = {
+  generation: string;
+  expiresAt: number;
+  parts: number;
+  stale?: boolean;
+};
 type Snapshot = Pointer & { articles: Article[] };
 class CacheStorageError extends Error {}
 async function cacheIO<T>(operation: () => Promise<T>) {
@@ -56,7 +61,7 @@ export function createPublicationCache({
     ) as Article[];
     return (memory = { ...meta, articles });
   }
-  async function write(articles: Article[]) {
+  async function write(articles: Article[], expectedRevision?: number) {
     const previous = (await cacheIO(() =>
       cache.get(LAST_GOOD),
     )) as Pointer | null;
@@ -79,6 +84,8 @@ export function createPublicationCache({
         ),
       ),
     );
+    if (expectedRevision !== undefined && expectedRevision !== revision)
+      return load();
     await cacheIO(() =>
       cache.set(POINTER, meta, {
         ttl: PUBLICATION_TTL,
@@ -115,7 +122,7 @@ export function createPublicationCache({
       if (newer) return newer;
     }
     console.info('Publication cache database refresh');
-    return write(articles);
+    return write(articles, started);
   }
   async function load(): Promise<Snapshot> {
     if (!pending) {
@@ -123,7 +130,7 @@ export function createPublicationCache({
       const task = (async () => {
         const hit = await cached(await pointer());
         if (hit) {
-          source = 'HIT';
+          source = hit.stale ? 'STALE' : 'HIT';
           return hit;
         }
         source = 'MISS';
@@ -137,7 +144,7 @@ export function createPublicationCache({
           const lastGood = await cached(backup);
           if (!lastGood) throw error;
           source = 'STALE';
-          const retry = { ...backup!, expiresAt: now() + 3600000 };
+          const retry = { ...backup!, expiresAt: now() + 3600000, stale: true };
           await cacheIO(() =>
             cache.set(POINTER, retry, {
               ttl: 3600,

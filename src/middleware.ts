@@ -54,7 +54,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     response.headers.set('CDN-Cache-Control', 'public, s-maxage=30');
     response.headers.set(
       'Vercel-CDN-Cache-Control',
-      `public, s-maxage=${Math.min(publicationCache.sharedMaxAge(), publicationCache.diagnostics().source === 'BYPASS' ? 30 : 86400)}`,
+      `public, s-maxage=${Math.min(publicationCache.sharedMaxAge(), publicationCache.diagnostics().source === 'BYPASS' ? 30 : publicationCache.diagnostics().source === 'STALE' ? 3600 : 86400)}`,
     );
     if (publicCacheEnabled()) {
       await addCacheTag(PUBLICATION_TAG);
